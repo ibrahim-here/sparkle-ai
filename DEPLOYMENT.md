@@ -28,11 +28,11 @@
 5. Add Environment Variables (click "Advanced" → "Add Environment Variable"):
    ```
    NODE_ENV=production
-   MONGODB_URI=mongodb+srv://fastfyp125_db_user:l48H1MarTyCSAR27@cluster0.pwwoobt.mongodb.net/sparkle-ai?retryWrites=true&w=majority
-   JWT_SECRET=sparkle-ai-super-secret-jwt-key-2024-change-this-in-production
+   MONGODB_URI=your_mongodb_connection_string
+   JWT_SECRET=your_jwt_secret_key_here
    JWT_EXPIRE=7d
-   GOOGLE_CLIENT_ID=835519228804-hnfp5fcjtv1jh76c1sjhuh2a34pjrjgq.apps.googleusercontent.com
-   GOOGLE_CLIENT_SECRET=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
+   GOOGLE_CLIENT_ID=your_google_client_id
+   GOOGLE_CLIENT_SECRET=your_google_client_secret
    GOOGLE_CALLBACK_URL=https://your-backend-url.onrender.com/api/auth/google/callback
    FRONTEND_URL=https://sparkle-ai-lime.vercel.app
    PORT=5000
