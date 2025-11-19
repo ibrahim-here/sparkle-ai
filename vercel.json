@@ -1,0 +1,12 @@
+{
+  "buildCommand": "cd sparkle-landing && npm install && npm run build",
+  "outputDirectory": "sparkle-landing/dist",
+  "installCommand": "cd sparkle-landing && npm install",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
