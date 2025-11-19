@@ -34,9 +34,24 @@ app.use('/api/auth', authRoutes);
 app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Health check route
+// Root route
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'Sparkle AI Backend API',
+    version: '1.0.0',
+    endpoints: {
+      health: '/health',
+      auth: '/api/auth',
+      onboarding: '/api/onboarding',
+      admin: '/api/admin'
+    }
+  });
+});
+
+// Health check route (for cron jobs to keep server awake)
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Server is running' });
+  res.json({ status: 'OK', message: 'Server is running', timestamp: new Date().toISOString() });
 });
 
 // Error handling middleware
