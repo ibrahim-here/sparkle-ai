@@ -17,14 +17,14 @@ export const RoadmapSection = () => {
           <div className="space-y-6 text-lg text-gray-700 leading-loose">
             <p>
               We're starting with{' '}
-              <span className="px-2 py-1 rounded font-medium" style={{ backgroundColor: 'rgba(178, 255, 0, 0.2)' }}>
+              <span className="px-2 py-1 rounded font-medium" style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)' }}>
                 Programming Fundamentals
               </span>{' '}
               —{' '}
-              <span className="px-2 py-1 rounded font-medium" style={{ backgroundColor: 'rgba(178, 255, 0, 0.2)' }}>variables</span>,{' '}
-              <span className="px-2 py-1 rounded font-medium" style={{ backgroundColor: 'rgba(178, 255, 0, 0.2)' }}>loops</span>,{' '}
-              <span className="px-2 py-1 rounded font-medium" style={{ backgroundColor: 'rgba(178, 255, 0, 0.2)' }}>conditions</span>, and{' '}
-              <span className="px-2 py-1 rounded font-medium" style={{ backgroundColor: 'rgba(178, 255, 0, 0.2)' }}>recursion</span>.
+              <span className="px-2 py-1 rounded font-medium" style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)' }}>variables</span>,{' '}
+              <span className="px-2 py-1 rounded font-medium" style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)' }}>loops</span>,{' '}
+              <span className="px-2 py-1 rounded font-medium" style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)' }}>conditions</span>, and{' '}
+              <span className="px-2 py-1 rounded font-medium" style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)' }}>recursion</span>.
             </p>
             
             <p>

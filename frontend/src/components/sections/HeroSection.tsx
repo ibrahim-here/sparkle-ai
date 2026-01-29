@@ -2,10 +2,9 @@ import { motion } from 'framer-motion';
 
 interface HeroSectionProps {
   onGetStarted: () => void;
-  onSignIn: () => void;
 }
 
-export const HeroSection = ({ onGetStarted, onSignIn }: HeroSectionProps) => {
+export const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
   return (
     <section
       id="hero"
@@ -78,12 +77,6 @@ export const HeroSection = ({ onGetStarted, onSignIn }: HeroSectionProps) => {
             Initialize Path
           </button>
 
-          <button
-            onClick={onSignIn}
-            className="h-16 px-10 glass text-white font-bold rounded-2xl hover:bg-white/5 transition-all duration-300 border border-white/10 uppercase tracking-widest text-sm"
-          >
-            System Status
-          </button>
         </motion.div>
 
         {/* Floating Decorative Elements */}

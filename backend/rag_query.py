@@ -7,7 +7,7 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 # Load environment
 load_dotenv()
 genai.configure(api_key=os.getenv("embedings"))
-model = genai.GenerativeModel("gemini-2.5-flash")
+model = genai.GenerativeModel("gemini-1.5-flash-latest")
 
 # Configuration
 CHROMA_DB_PATH = "./chroma_db"

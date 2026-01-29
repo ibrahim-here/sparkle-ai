@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from routes import auth, onboarding, chat
+from routes import auth, onboarding, chat, notebook
 from database import connect_to_mongo, close_mongo_connection
 import os
 from dotenv import load_dotenv
@@ -37,6 +37,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(onboarding.router)
 app.include_router(chat.router)
+app.include_router(notebook.router)
 
 @app.get("/")
 async def root():

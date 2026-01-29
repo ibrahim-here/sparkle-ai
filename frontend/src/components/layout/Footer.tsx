@@ -25,7 +25,7 @@ export const Footer = () => {
             {/* Logo and Tagline */}
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <span style={{ color: '#B2FF00' }}>
+                <span style={{ color: '#8B5CF6' }}>
                   <SparkleIcon size={32} />
                 </span>
                 <span className="font-bold text-2xl">Sparkle</span>
@@ -42,8 +42,8 @@ export const Footer = () => {
                     <a
                       href={link.href}
                       className="text-gray-400 transition-colors inline-block hover:glow-effect-hover"
-                    style={{ '--hover-color': '#B2FF00' } as React.CSSProperties}
-                    onMouseEnter={(e) => e.currentTarget.style.color = '#B2FF00'}
+                    style={{ '--hover-color': '#8B5CF6' } as React.CSSProperties}
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#8B5CF6'}
                     onMouseLeave={(e) => e.currentTarget.style.color = ''}
                     >
                       {link.label}
@@ -63,7 +63,7 @@ export const Footer = () => {
                     href={social.href}
                     aria-label={social.label}
                     className="text-gray-400 transition-all hover:scale-110 hover:glow-effect-hover"
-                    onMouseEnter={(e) => e.currentTarget.style.color = '#B2FF00'}
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#8B5CF6'}
                     onMouseLeave={(e) => e.currentTarget.style.color = ''}
                   >
                     {social.icon}

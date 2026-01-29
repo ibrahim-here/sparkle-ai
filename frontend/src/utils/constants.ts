@@ -1,15 +1,15 @@
 // Color Palette
 export const COLORS = {
-  primary: '#B2FF00',
-  secondary: '#000000',
-  accent: '#FFFFFF',
-  neutral: '#F3F3F3',
-  glow: 'rgba(178, 255, 0, 0.4)',
+  primary: '#8B5CF6',
+  secondary: '#020617',
+  accent: '#22D3EE',
+  neutral: '#0F172A',
+  glow: 'rgba(139, 92, 246, 0.4)',
   text: {
-    primary: '#000000',
-    secondary: '#333333',
-    tertiary: '#666666',
-    muted: '#999999',
+    primary: '#FFFFFF',
+    secondary: '#94A3B8',
+    tertiary: '#64748B',
+    muted: '#475569',
   },
 } as const;
 

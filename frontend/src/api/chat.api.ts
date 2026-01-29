@@ -25,8 +25,8 @@ export interface ChatQueryResponse {
 }
 
 export const chatAPI = {
-    sendQuery: async (query: string, sessionId?: string, signal?: AbortSignal): Promise<ChatQueryResponse> => {
-        const response = await api.post('/api/chat/query', { query, sessionId }, { signal });
+    sendQuery: async (query: string, sessionId?: string, signal?: AbortSignal, manualStyle?: string): Promise<ChatQueryResponse> => {
+        const response = await api.post('/api/chat/query', { query, sessionId, manualStyle }, { signal });
         return response.data;
     },
 

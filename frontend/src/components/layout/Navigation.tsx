@@ -24,7 +24,6 @@ export const Navigation = ({ onCTAClick, onSignInClick }: NavigationProps) => {
 
   const navLinks = isLandingPage ? [
     { label: 'Features', href: 'features' },
-    { label: 'Intelligence', href: 'how-it-works' },
   ] : [];
 
   const handleNavClick = (href: string) => {

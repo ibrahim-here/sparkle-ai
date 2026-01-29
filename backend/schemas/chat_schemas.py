@@ -11,6 +11,8 @@ class ChatSession(BaseModel):
     id: Optional[str] = Field(None, alias="_id")
     userId: str
     title: str
+    session_type: str = "chat"  # 'chat' or 'notebook'
+    uploaded_files: List[str] = []
     messages: List[ChatMessage] = []
     createdAt: datetime = Field(default_factory=datetime.now)
     updatedAt: datetime = Field(default_factory=datetime.now)
@@ -20,3 +22,4 @@ class ChatSession(BaseModel):
 
 class CreateSessionRequest(BaseModel):
     title: Optional[str] = "New Conversation"
+    session_type: Optional[str] = "chat"  # 'chat' or 'notebook'

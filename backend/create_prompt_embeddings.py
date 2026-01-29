@@ -1,110 +1,127 @@
 import os
+import glob
 from dotenv import load_dotenv
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_experimental.text_splitter import SemanticChunker
 from langchain_core.documents import Document
 
 # Load environment
 load_dotenv()
 
 # Configuration
-PROMPT_DIR = "./promptEngineering"
-CHROMA_DB_PATH = "./chroma_db"
-COLLECTION_NAME = "prompt_engineering"
+PROMPT_ENG_DIR = "./promptEngineering"
+CHROMA_DB_PATH = "./chroma_db_prompt_engineering"
+COLLECTION_NAME = "prompt_engineering_concepts"
 
-def load_prompt_guides():
-    """Load all .txt files from the prompt engineering directory"""
-    documents = []
+def load_and_chunk_files():
+    """Load all .txt files from promptEngineering and apply Semantic Chunking"""
+    all_chunks = []
+    chunk_global_id = 0
     
-    if not os.path.exists(PROMPT_DIR):
-        print(f"❌ Directory not found: {PROMPT_DIR}")
-        return []
-
-    print(f"Scanning {PROMPT_DIR}...")
-    
-    for filename in os.listdir(PROMPT_DIR):
-        if filename.endswith(".txt"):
-            file_path = os.path.join(PROMPT_DIR, filename)
-            print(f"  - Loading {filename}...")
-            
-            try:
-                with open(file_path, "r", encoding="utf-8") as f:
-                    text = f.read()
-                    if text.strip():
-                        documents.append(Document(
-                            page_content=text,
-                            metadata={"source": filename, "type": "guide"}
-                        ))
-            except Exception as e:
-                print(f"  Warning: Error reading {filename}: {e}")
-
-    return documents
-
-def split_documents(documents):
-    """Split documents into smaller chunks for embedding"""
-    print(f"\nSplitting {len(documents)} documents into chunks...")
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200,
-        separators=["\n\n", "\n", " ", ""],
-        length_function=len,
-    )
-    chunks = text_splitter.split_documents(documents)
-    print(f"   -> Created {len(chunks)} chunks.")
-    return chunks
-
-def create_vector_db(chunks):
-    """Create ChromaDB vector database with LOCAL HuggingFace embeddings"""
-    print(f"\nCreating vector database for PROMPT ENGINEERING...")
-    print("Loading local embedding model...")
-    
-    # Initialize HuggingFace embeddings
+    print("Initializing Embedding Model for Semantic Chunking...")
     embedding_model = HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
     
-    print(f"Creating vector store in collection '{COLLECTION_NAME}'...")
+    print("Initializing Semantic Chunker...")
+    text_splitter = SemanticChunker(
+        embedding_model,
+        breakpoint_threshold_type="percentile" 
+    )
     
-    # Create Chroma vector store
+    # Find all .txt files
+    txt_files = glob.glob(os.path.join(PROMPT_ENG_DIR, "*.txt"))
+    
+    if not txt_files:
+        print(f"No .txt files found in {PROMPT_ENG_DIR}")
+        return []
+
+    for file_path in txt_files:
+        print(f"\nProcessing {file_path}...")
+        filename = os.path.basename(file_path)
+        
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                
+            if not content.strip():
+                print(f"Skipping empty file: {filename}")
+                continue
+
+            # Apply Semantic Chunking
+            print(f"  - Splitting text (length: {len(content)} chars)...")
+            splits = text_splitter.split_text(content)
+            
+            print(f"  - Generated {len(splits)} chunks.")
+            
+            # Create Document Objects
+            for split_text in splits:
+                all_chunks.append({
+                    'id': f"{filename}_chunk_{chunk_global_id}",
+                    'text': split_text,
+                    'metadata': {
+                        'source': filename,
+                        'type': 'prompt_guide_chunk'
+                    }
+                })
+                chunk_global_id += 1
+                
+        except Exception as e:
+            print(f"Error processing {filename}: {e}")
+            continue
+            
+    return all_chunks
+
+def create_vector_db(chunks):
+    """Create ChromaDB vector database"""
+    print(f"\n\nCreating vector database with {len(chunks)} semantic chunks...")
+    
+    embedding_model = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
+    
+    documents = [
+        Document(
+            page_content=chunk['text'],
+            metadata=chunk['metadata']
+        )
+        for chunk in chunks
+    ]
+    
+    print(f"Writing to {CHROMA_DB_PATH}...")
+    
     vector_store = Chroma.from_documents(
-        documents=chunks,
+        documents=documents,
         embedding=embedding_model,
         persist_directory=CHROMA_DB_PATH,
         collection_name=COLLECTION_NAME
     )
     
-    print(f"Vector database updated at: {CHROMA_DB_PATH}")
-    print(f"   Collection: {COLLECTION_NAME}")
-    print(f"Prompt Engineering guides are now embedded!")
+    print(f"Vector database created at: {CHROMA_DB_PATH}")
+    print(f"Total chunks embedded: {len(chunks)}")
     
     return vector_store
 
 def main():
     print("=" * 60)
-    print("Creating Embeddings for Prompt Engineering Guides")
+    print("Creating PROMPT ENGINEERING Embeddings (Semantic)")
     print("=" * 60)
     
-    # 1. Load Documents
-    documents = load_prompt_guides()
-    
-    if not documents:
-        print("❌ No documents found. Exiting.")
-        return
-    
-    # 2. Split into Chunks
-    chunks = split_documents(documents)
+    chunks = load_and_chunk_files()
     
     if not chunks:
-        print("❌ No chunks created. Exiting.")
+        print("Error: No chunks extracted.")
         return
-
-    # 3. Create/Update Vector DB
+    
+    print(f"\nTotal semantic chunks generated: {len(chunks)}")
+    
     create_vector_db(chunks)
     
     print("\n" + "=" * 60)
-    print("Process Complete!")
+    print("COMPLETE!")
     print("=" * 60)
+    print(f"Target DB: {CHROMA_DB_PATH}")
 
 if __name__ == "__main__":
     main()

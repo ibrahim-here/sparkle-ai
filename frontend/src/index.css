@@ -3,10 +3,14 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #B2FF00;
-  --color-secondary: #050505;
-  --color-accent: #00F0FF;
-  --color-surface: #121212;
+  --color-primary: #8B5CF6;
+  /* Futuristic Violet */
+  --color-primary-glow: rgba(139, 92, 246, 0.5);
+  --color-secondary: #020617;
+  /* Deep Space Blue */
+  --color-accent: #22D3EE;
+  /* Cyber Cyan */
+  --color-surface: #0F172A;
 
   --font-outfit: "Outfit", sans-serif;
 }
@@ -27,8 +31,8 @@
   }
 
   ::selection {
-    background: #B2FF00;
-    color: #050505;
+    background: #8B5CF6;
+    color: #FFFFFF;
   }
 }
 
@@ -41,31 +45,49 @@
   }
 
   .glass-neon {
-    background: rgba(178, 255, 0, 0.03);
+    background: rgba(139, 92, 246, 0.03);
     backdrop-filter: blur(12px);
-    border: 1px solid rgba(178, 255, 0, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.1);
   }
 
   .glow-text-primary {
-    text-shadow: 0 0 10px rgba(178, 255, 0, 0.5);
+    text-shadow: 0 0 15px rgba(139, 92, 246, 0.6);
   }
 
   .glow-text-accent {
-    text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+    text-shadow: 0 0 15px rgba(34, 211, 238, 0.6);
   }
 
   .cyber-grid {
-    background-size: 40px 40px;
+    background-size: 60px 60px;
     background-image:
-      linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      linear-gradient(to right, rgba(139, 92, 246, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(34, 211, 238, 0.05) 1px, transparent 1px);
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, #B2FF00 0%, #00F0FF 100%);
+    background: linear-gradient(135deg, #8B5CF6 0%, #22D3EE 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+  }
+
+  .animate-neon-pulse {
+    animation: neon-pulse 2s infinite ease-in-out;
+  }
+
+  @keyframes neon-pulse {
+
+    0%,
+    100% {
+      border-color: rgba(139, 92, 246, 0.2);
+      box-shadow: 0 0 5px rgba(139, 92, 246, 0.1);
+    }
+
+    50% {
+      border-color: rgba(139, 92, 246, 0.6);
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+    }
   }
 
   /* Scanline Effect */

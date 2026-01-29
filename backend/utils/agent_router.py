@@ -14,7 +14,12 @@ def select_agent(learning_style: dict, manual_style: str = None) -> str:
         'visual': 'indepth_explainer_agent.py',
         'reading': 'indepth_explainer_agent.py',
         'kinesthetic': 'analogy_agent.py',
-        'mixed': 'indepth_explainer_agent.py'
+        'mixed': 'indepth_explainer_agent.py',
+        # Handle frontend manual selection values directly
+        'explainer': 'indepth_explainer_agent.py',
+        'analogy': 'analogy_agent.py'
     }
 
-    return agent_map.get(style, 'indepth_explainer_agent.py')
+    selected = agent_map.get(style, 'indepth_explainer_agent.py')
+    print(f"[Router] Target style: {style} -> Assigned Agent: {selected}")
+    return selected

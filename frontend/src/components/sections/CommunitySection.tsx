@@ -54,7 +54,7 @@ export const CommunitySection = ({ onCTAClick }: CommunitySectionProps) => {
                     <span
                       key={i}
                       className="text-xs px-2 py-1 rounded-full font-medium"
-                      style={{ backgroundColor: 'rgba(178, 255, 0, 0.2)', color: '#000000' }}
+                      style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: '#000000' }}
                     >
                       {tag}
                     </span>

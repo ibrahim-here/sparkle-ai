@@ -28,7 +28,7 @@ export const Button = ({
   };
   
   const primaryStyle = variant === 'primary' ? {
-    backgroundColor: '#B2FF00',
+    backgroundColor: '#8B5CF6',
     color: '#000000',
   } : {};
   
@@ -43,7 +43,7 @@ export const Button = ({
       style={{ ...primaryStyle, ...secondaryStyle }}
       whileHover={{ 
         scale: 1.05,
-        boxShadow: variant === 'primary' ? '0 0 20px rgba(178, 255, 0, 0.4)' : undefined,
+        boxShadow: variant === 'primary' ? '0 0 20px rgba(139, 92, 246, 0.4)' : undefined,
         backgroundColor: variant === 'secondary' ? '#000000' : undefined,
         color: variant === 'secondary' ? '#FFFFFF' : undefined,
       }}

@@ -45,7 +45,7 @@ export const TestimonialsSection = () => {
               transition={{ duration: 0.6, delay: index * 0.2 }}
               className="bg-white rounded-xl p-8 shadow-md"
             >
-              <Quote style={{ color: '#B2FF00' }} className="mb-4" size={32} />
+              <Quote style={{ color: '#8B5CF6' }} className="mb-4" size={32} />
               <p className="text-lg italic text-gray-700 mb-6 leading-relaxed">
                 "{testimonial.quote}"
               </p>

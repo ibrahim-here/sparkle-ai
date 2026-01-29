@@ -4,7 +4,6 @@ import { ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { authAPI } from '../api/auth.api';
 import { Navigation } from '../components/layout/Navigation';
-import { Footer } from '../components/layout/Footer';
 
 const ProfilePage = () => {
     const { user, refreshUser } = useAuth();
@@ -155,8 +154,6 @@ const ProfilePage = () => {
                     </div>
                 </div>
             </main>
-
-            <Footer />
         </div>
     );
 };

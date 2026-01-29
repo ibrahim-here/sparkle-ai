@@ -12,35 +12,16 @@ from datetime import datetime
 import uuid
 from schemas.chat_schemas import ChatMessage, ChatSession, CreateSessionRequest
 from utils.auth import get_current_user
+from Agents.graph import run_sparkle_graph
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 
 class ChatQuery(BaseModel):
     query: str
     sessionId: Optional[str] = None
+    manualStyle: Optional[str] = None
 
-async def run_agent_script(script_name: str, query: str, profile: str):
-    script_path = os.path.join("Agents", script_name)
-    python_path = sys.executable  # Use current venv python
-    
-    input_data = json.dumps({"query": query, "profile": profile})
-    
-    # Run agent as subprocess (as in the original JS version)
-    process = subprocess.Popen(
-        [python_path, script_path, input_data],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        encoding='utf-8'
-    )
-    
-    stdout, stderr = process.communicate()
-    
-    if process.returncode != 0:
-        print(f"Agent Error: {stderr}")
-        raise Exception(f"Agent {script_name} failed: {stderr}")
-    
-    return stdout
+# run_agent_script is now redundant as we use the LangGraph app directly
 
 @router.post("/query")
 async def handle_query(chat_query: ChatQuery, current_user: dict = Depends(get_current_user)):
@@ -57,37 +38,27 @@ async def handle_query(chat_query: ChatQuery, current_user: dict = Depends(get_c
     session_id = chat_query.sessionId
 
     try:
-        # Step 1: Call Planner Agent to enhance user input
-        print("\n✨ STEP 1: ENHANCING INPUT (Planner Agent)")
-        enhanced_prompt = await run_agent_script(
-            "planner_agent.py", 
-            chat_query.query, 
-            learner_summary
-        )
-        enhanced_prompt = enhanced_prompt.strip()
+        # Unified Step: Run the LangGraph orchestration
+        print("\n⚡ EXECUTING SPARKLE AI GRAPH")
+        learning_style = current_user.get("learning_style", {}) # Assuming dict
+        # Priority: Use specifically requested style from UI, or fall back to user's database preference
+        active_manual_style = chat_query.manualStyle or current_user.get("manualLearningStyle")
         
-        print("\n" + "-"*30 + " ENHANCED PROMPT " + "-"*30)
-        print(enhanced_prompt)
-        print("-" * 77)
-
-        # Step 2: Decide the most matching agent
-        print("\n🎯 STEP 2: AGENT ROUTING")
-        learning_style = current_user.get("learningStyle", {})
-        manual_style = current_user.get("manualLearningStyle")
-        selected_agent = select_agent(learning_style, manual_style)
-        print(f"   Selected Path: {selected_agent}")
-
-        # Step 3: Run the selected agent with the enhanced prompt
-        print(f"\n🤖 STEP 3: EXECUTING {selected_agent.upper()}")
-        print(f"   Generating personalized response...")
-        response = await run_agent_script(
-            selected_agent, 
-            enhanced_prompt, 
-            learner_summary
+        # Note: If history is needed, fetch previous messages here
+        graph_result = await run_sparkle_graph(
+            query=chat_query.query,
+            learner_summary=learner_summary,
+            learning_style=learning_style,
+            manual_style=active_manual_style
         )
-        response_text = response.strip()
         
-        print("\n✅ PROCESS COMPLETE - RESPONSE GENERATED")
+        enhanced_prompt = graph_result["enhanced_prompt"]
+        selected_agent = graph_result["selected_agent"]
+        response_text = graph_result["response"]
+        
+        print(f"\n✨ ENHANCED PROMPT: {enhanced_prompt}")
+        print(f"🎯 SELECTED AGENT: {selected_agent}")
+        print(f"🤖 RESPONSE GENERATED")
         print("="*50 + "\n")
 
         # Persistence Logic
@@ -132,7 +103,7 @@ async def handle_query(chat_query: ChatQuery, current_user: dict = Depends(get_c
 async def get_sessions(current_user: dict = Depends(get_current_user)):
     db = get_database()
     sessions = await db.chat_sessions.find(
-        {"userId": current_user["_id"]}
+        {"userId": current_user["_id"], "session_type": "chat"}  # Only return regular chat sessions
     ).sort("updatedAt", -1).to_list(100)
     
     # Clean up _id for frontend
@@ -151,6 +122,7 @@ async def create_session(req: CreateSessionRequest, current_user: dict = Depends
         _id=session_id,
         userId=current_user["_id"],
         title=req.title or "New Conversation",
+        session_type=req.session_type or "chat",
         messages=[]
     )
     await db.chat_sessions.insert_one(new_session.model_dump(by_alias=True))

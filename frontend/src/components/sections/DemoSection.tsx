@@ -12,19 +12,18 @@ export const DemoSection = () => {
       content: (
         <div className="flex items-center justify-center h-full">
           <div className="w-full max-w-2xl">
-            <div className="bg-white rounded-lg shadow-lg p-6 border-2" style={{ borderColor: '#B2FF00' }}>
+            <div className="bg-secondary/80 rounded-lg shadow-lg p-6 border-2 border-primary/30">
               <div className="flex items-center gap-3 mb-4">
-                <Search style={{ color: '#B2FF00' }} size={24} />
+                <Search className="text-primary" size={24} />
                 <input
                   type="text"
                   value="I want to learn recursion"
                   readOnly
-                  className="flex-1 text-lg font-medium outline-none"
+                  className="flex-1 text-lg font-medium outline-none bg-transparent text-white"
                 />
               </div>
-              <button 
-                className="px-6 py-2 rounded-full font-medium"
-                style={{ backgroundColor: '#B2FF00', color: '#000000' }}
+              <button
+                className="px-6 py-2 rounded-full font-bold bg-primary text-secondary hover:shadow-glow-primary transition-all"
               >
                 Generate Path
               </button>
@@ -44,10 +43,10 @@ export const DemoSection = () => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-white rounded-lg shadow-md p-4 flex items-center gap-3"
+                className="bg-secondary/50 glass border border-white/5 rounded-lg shadow-md p-4 flex items-center gap-3"
               >
-                <CheckCircle2 style={{ color: '#B2FF00' }} size={24} />
-                <span className="font-medium">{milestone}</span>
+                <CheckCircle2 className="text-accent" size={24} />
+                <span className="font-medium text-white/90">{milestone}</span>
               </motion.div>
             ))}
           </div>
@@ -58,9 +57,9 @@ export const DemoSection = () => {
       title: 'Visual Learning',
       content: (
         <div className="flex items-center justify-center h-full">
-          <div className="bg-white rounded-lg shadow-lg p-8">
-            <GitBranch size={120} style={{ color: '#B2FF00' }} className="mx-auto" />
-            <p className="text-center mt-4 text-gray-600 font-medium">
+          <div className="bg-secondary/50 glass border border-white/5 rounded-lg shadow-lg p-8">
+            <GitBranch size={120} className="mx-auto text-primary animate-float" />
+            <p className="text-center mt-4 text-white/60 font-medium italic">
               Interactive SVG Visualization
             </p>
           </div>
@@ -107,7 +106,7 @@ export const DemoSection = () => {
             <div className="flex gap-2">
               <div className="w-3 h-3 rounded-full bg-red-400"></div>
               <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-              <div className="w-3 h-3 rounded-full bg-green-400"></div>
+              <div className="w-3 h-3 rounded-full bg-accent/40"></div>
             </div>
             <div className="flex-1 bg-white rounded px-3 py-1 text-sm text-gray-500">
               sparkle.ai/learn
@@ -136,10 +135,8 @@ export const DemoSection = () => {
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index)}
-                className={`w-3 h-3 rounded-full transition-all ${
-                  index === currentSlide ? 'w-8' : 'bg-gray-300'
-                }`}
-                style={index === currentSlide ? { backgroundColor: '#B2FF00' } : {}}
+                className={`w-3 h-3 rounded-full transition-all ${index === currentSlide ? 'w-8 bg-primary shadow-glow-primary' : 'bg-white/20'
+                  }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}

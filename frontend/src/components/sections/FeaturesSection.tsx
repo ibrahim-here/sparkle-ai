@@ -7,7 +7,7 @@ export const FeaturesSection = () => {
       icon: Layout,
       title: 'Adaptive Interface',
       description: 'The dashboard morphs based on your mental load and complexity of the subject matter.',
-      color: '#B2FF00'
+      color: '#8B5CF6'
     },
     {
       icon: Layers,
@@ -25,7 +25,7 @@ export const FeaturesSection = () => {
       icon: ShieldCheck,
       title: 'Validation Core',
       description: 'Real-time assessment feedback loop ensuring zero conceptual entropy during mastery.',
-      color: '#B2FF00'
+      color: '#8B5CF6'
     },
   ];
 

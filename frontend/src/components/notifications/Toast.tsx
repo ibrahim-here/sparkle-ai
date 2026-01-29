@@ -17,9 +17,9 @@ const Toast = ({ message, type, duration = 3000, onClose }: ToastProps) => {
   }, [duration, onClose]);
 
   const bgColor = {
-    success: 'bg-green-500',
-    error: 'bg-red-500',
-    info: 'bg-blue-500'
+    success: 'glass-neon border-accent/30 text-accent glow-text-accent',
+    error: 'bg-red-500/10 border border-red-500/20 text-red-400',
+    info: 'glass border-white/10 text-white/70'
   }[type];
 
   const icon = {

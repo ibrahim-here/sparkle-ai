@@ -11,7 +11,7 @@ export const HowItWorksSection = ({ onCTAClick }: HowItWorksSectionProps) => {
       icon: BrainCircuit,
       title: 'Neural Mapping',
       description: 'Our system analyzes your cognitive learning style through a rapid coding-logic quiz.',
-      color: '#B2FF00'
+      color: '#8B5CF6'
     },
     {
       icon: Search,

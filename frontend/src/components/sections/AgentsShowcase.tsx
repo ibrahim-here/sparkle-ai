@@ -7,7 +7,7 @@ const agents = [
         name: 'In-Depth Explainer',
         description: 'Deconstructs complex architectures into fundamental principles using first-principles thinking.',
         icon: Brain,
-        color: '#B2FF00',
+        color: '#8B5CF6',
         delay: 0.1
     },
     {

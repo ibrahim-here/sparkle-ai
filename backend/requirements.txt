@@ -1,5 +1,5 @@
 python-dotenv
-google-generativeai
+google-genai
 langchain-community
 langchain-core
 chromadb
@@ -15,3 +15,6 @@ passlib[bcrypt]
 python-multipart
 email-validator
 httpx
+langgraph
+langchain-chroma
+pypdf

@@ -2,18 +2,16 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Navigation } from './components/layout/Navigation';
-import { Footer } from './components/layout/Footer';
 import { HeroSection } from './components/sections/HeroSection';
 import { AgentsShowcase } from './components/sections/AgentsShowcase';
-import { HowItWorksSection } from './components/sections/HowItWorksSection';
 import { FeaturesSection } from './components/sections/FeaturesSection';
 import { DemoSection } from './components/sections/DemoSection';
-import { TestimonialsSection } from './components/sections/TestimonialsSection';
 import { FinalCTASection } from './components/sections/FinalCTASection';
 import { AuthModal } from './components/auth/AuthModal';
 import OnboardingPage from './pages/OnboardingPage';
 import DashboardPage from './pages/DashboardPage';
 import ProfilePage from './pages/ProfilePage';
+import NotebookPage from './pages/NotebookPage';
 import { onboardingAPI } from './api/onboarding.api';
 
 function LandingPage() {
@@ -35,16 +33,13 @@ function LandingPage() {
       <Navigation onCTAClick={handleGetStarted} onSignInClick={handleSignIn} />
 
       <main>
-        <HeroSection onGetStarted={handleGetStarted} onSignIn={handleSignIn} />
+        <HeroSection onGetStarted={handleGetStarted} />
         <AgentsShowcase />
-        <HowItWorksSection onCTAClick={handleGetStarted} />
         <FeaturesSection />
         <DemoSection />
-        <TestimonialsSection />
         <FinalCTASection onGetStarted={handleGetStarted} />
       </main>
 
-      <Footer />
 
       <AuthModal
         isOpen={authModalOpen}
@@ -168,6 +163,7 @@ function App() {
           <Route path="/onboarding" element={<OnboardingRoute />} />
           <Route path="/dashboard" element={<DashboardRoute />} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          <Route path="/notebook" element={<ProtectedRoute><NotebookPage /></ProtectedRoute>} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

@@ -1,82 +1,14 @@
 import os
 import sys
 import json
-from dotenv import load_dotenv
-import requests
-from langchain_community.vectorstores import Chroma
-from langchain_community.embeddings import HuggingFaceEmbeddings
-
-# Load environment
-load_dotenv()
-
-# OpenRouter API Configuration
-OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
-PRIMARY_MODEL = "meta-llama/llama-3.2-3b-instruct:free"
-
-# Load API keys
-PRIMARY_API_KEY = os.getenv("embedings")
+from utils.ai_utils import call_ai, get_vector_store
 
 # Configuration
-CHROMA_DB_PATH = "../chroma_db"  # Path relative to backend/Agents/ folder
+CHROMA_DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "chroma_db_semantics")
 COLLECTION_NAME = "cpp_textbook"
-TOP_K_RESULTS = 5  # Number of relevant chunks to retrieve
+TOP_K_RESULTS = 5
 
-def call_openrouter_api(prompt, model, api_key, temperature=0.7, max_tokens=1000):
-    """Call OpenRouter API with specified model"""
-    try:
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://github.com/sparkle-ai",
-            "X-Title": "Sparkle AI - Analogy Agent"
-        }
-        
-        payload = {
-            "model": model,
-            "messages": [{"role": "user", "content": prompt}],
-            "temperature": temperature,
-            "max_tokens": max_tokens
-        }
-        
-        response = requests.post(OPENROUTER_API_URL, headers=headers, json=payload, timeout=30)
-        response.raise_for_status()
-        
-        result = response.json()
-        return result["choices"][0]["message"]["content"]
-        
-    except Exception as e:
-        print(f"API Error: {e}")
-        return None
-
-def generate_with_fallback(prompt):
-    """
-    Generate content using the primary model.
-    """
-    print(f"Using primary model: {PRIMARY_MODEL}")
-    result = call_openrouter_api(prompt, PRIMARY_MODEL, PRIMARY_API_KEY)
-    
-    if result:
-        return result
-    
-    raise Exception(f"Primary model {PRIMARY_MODEL} failed to generate response")
-
-def load_vector_db():
-    """Load the existing ChromaDB collection with LOCAL embeddings"""
-    print("[Load] Loading local embedding model...")
-    
-    # Use same local embeddings as createembeddings.py
-    embedding_model = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
-    )
-    
-    # Load existing vector store
-    vector_store = Chroma(
-        persist_directory=CHROMA_DB_PATH,
-        embedding_function=embedding_model,
-        collection_name=COLLECTION_NAME
-    )
-    
-    return vector_store
+# Removed call_openrouter_api and load_vector_db as they are now in ai_utils
 
 def retrieve_relevant_context(vector_store, query, top_k=TOP_K_RESULTS):
     """Retrieve relevant chunks from vector database using LangChain"""
@@ -101,6 +33,12 @@ def retrieve_relevant_context(vector_store, query, top_k=TOP_K_RESULTS):
         f"[Chapter {ctx['chapter']} - {ctx['type']}]\n{ctx['text']}" 
         for ctx in contexts
     ])
+
+    print(f"\n[DEBUG] EMBEDDING DATA RETRIEVED ({len(contexts)} chunks):")
+    for idx, ctx in enumerate(contexts, 1):
+        print(f"--- Chunk {idx} (Dist: {ctx['distance']:.3f}) ---")
+        print(f"{ctx['text'][:200]}...")
+    print("-------------------------------------------\n")
     
     return combined_context, contexts
 
@@ -157,7 +95,10 @@ Create 2-3 relatable analogies (250-400 words total) to explain this concept.
 {common_guidelines}
 Provide your focused analogies now:"""
     
-    analogies = generate_with_fallback(prompt)
+    analogies = call_ai(prompt, temperature=0.5)
+    if not analogies:
+        print("[Analogy] Warning: AI failed, using fallback message")
+        return "I'm having trouble creating analogies right now. My AI circuits are a bit overloaded! Please try again in a moment. ⚡"
     return analogies.strip()
 
 def get_analogies(question, learner_profile=None):
@@ -172,7 +113,7 @@ def get_analogies(question, learner_profile=None):
     
     # Load vector database
     print("\n[Search] Searching textbook for relevant content...")
-    vector_store = load_vector_db()
+    vector_store = get_vector_store(CHROMA_DB_PATH, COLLECTION_NAME)
     
     # Retrieve relevant context
     context, contexts = retrieve_relevant_context(vector_store, question)

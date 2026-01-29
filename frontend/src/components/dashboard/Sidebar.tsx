@@ -95,6 +95,14 @@ const Sidebar = ({ isOpen, onToggle, currentSessionId, onSessionSelect, sessionU
             <span className="text-xl">✏️</span>
             <span className="font-medium">New chat</span>
           </button>
+
+          <button
+            onClick={() => navigate('/notebook')}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all group hover:bg-white/5 text-white/70 hover:text-blue-400"
+          >
+            <span className="text-xl">📘</span>
+            <span className="font-medium">Notebook Mode</span>
+          </button>
         </div>
 
         {/* Sessions List */}
@@ -115,8 +123,8 @@ const Sidebar = ({ isOpen, onToggle, currentSessionId, onSessionSelect, sessionU
                 key={session.id}
                 onClick={() => onSessionSelect(session.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all group relative overflow-hidden ${currentSessionId === session.id
-                    ? 'bg-white/10 text-white'
-                    : 'hover:bg-white/5 text-white/50 hover:text-white'
+                  ? 'bg-white/10 text-white'
+                  : 'hover:bg-white/5 text-white/50 hover:text-white'
                   }`}
               >
                 <span className="text-sm truncate flex-1 text-left">{session.title}</span>

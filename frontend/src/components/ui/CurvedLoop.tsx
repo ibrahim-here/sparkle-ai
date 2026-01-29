@@ -133,7 +133,7 @@ const CurvedLoop: FC<CurvedLoopProps> = ({
           <path ref={pathRef} id={pathId} d={pathD} fill="none" stroke="transparent" />
         </defs>
         {ready && (
-          <text xmlSpace="preserve" className={className ?? ''} fill="#B2FF00">
+          <text xmlSpace="preserve" className={className ?? ''} fill="#8B5CF6">
             <textPath
               ref={textPathRef}
               href={`#${pathId}`}
