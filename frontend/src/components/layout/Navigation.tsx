@@ -127,18 +127,13 @@ export const Navigation = ({ onCTAClick, onSignInClick }: NavigationProps) => {
               </div>
             ) : (
               <div className="flex items-center space-x-6">
-                <button
-                  onClick={onSignInClick}
-                  className="text-white/60 hover:text-white transition-colors font-medium text-sm"
-                >
-                  Sign In
-                </button>
+                
                 <Button
                   onClick={onCTAClick}
                   size="small"
                   className="bg-primary text-secondary hover:shadow-glow-primary transition-all duration-300 px-6 py-2.5 rounded-full font-bold"
                 >
-                  Initialize
+                  Sign In
                 </Button>
               </div>
             )}

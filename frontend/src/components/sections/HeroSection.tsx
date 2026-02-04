@@ -26,7 +26,7 @@ export const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
           transition={{ duration: 0.6, delay: 0.2 }}
         >
           <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-          <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/50">System Version 2.0.4 - Live</span>
+          <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/50">System Version 1.0.1 - Live</span>
         </motion.div>
 
         {/* Main Heading */}
