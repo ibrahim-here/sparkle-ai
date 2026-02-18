@@ -4,7 +4,7 @@ import json
 from utils.ai_utils import call_ai, get_vector_store
 
 # Configuration
-CHROMA_DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "chroma_db_semantics")
+CHROMA_DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "chroma_db_semantic")
 COLLECTION_NAME = "cpp_textbook"
 TOP_K_RESULTS = 5
 
@@ -61,8 +61,8 @@ Tailor the analogies to this profile. If the student has secondary preferences (
 📝 FORMATTING GUIDELINES:
 - **NO markdown heading symbols** (like # or ##).
 - **NO dashed or equals line separators** (like --- or ===).
-- Use **BOLD text** for the main title and each analogy header (e.g., **Analogy 1: [Name]**).
-- Use **bold text** for connections between the analogy and C++ concepts.
+- Use BOLD text and Proper heading bigger text size like h1 or h2 like we use in react  for the main title and each analogy header (e.g., **Analogy 1: [Name]**).
+- Use bold text for connections between the analogy and C++ concepts.
 - Use numbered lists (1., 2., 3.) for multi-step breakdowns.
 - Keep output clean and optimized for a dark UI.
 """
@@ -80,6 +80,7 @@ Tailor the analogies to this profile. If the student has secondary preferences (
 🎯 YOUR TASK:
 Create 2-3 relatable analogies (250-400 words total) to explain this concept.
 {common_guidelines}
+Format them remove add headings and lists so that its properly formated . Use emojis too to make output look good. remove steric ** or anything that make it seem like written by ai 
 Provide your focused analogies now:"""
     else:
         # No relevant context found - use general knowledge

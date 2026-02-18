@@ -5,7 +5,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 import traceback
 
 # Configuration
-CHROMA_DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chroma_db")
+CHROMA_DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chroma_db_semantic")
 COLLECTION_NAME = "cpp_textbook"
 
 def test_embeddings():
