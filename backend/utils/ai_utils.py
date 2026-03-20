@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
+from flashrank import Ranker
 
 # Load environment and allow overrides if .env changes
 load_dotenv(override=True)
@@ -16,6 +17,7 @@ _embedding_model = None
 _vector_stores = {}
 _client = None
 _last_key = None
+_reranker_model = None
 
 def get_gemini_client(api_key=None):
     """Return client, re-initializing if the key in .env has changed or a specific key is provided."""
@@ -55,6 +57,15 @@ def get_embedding_model():
             model_name="sentence-transformers/all-MiniLM-L6-v2"
         )
     return _embedding_model
+
+def get_reranker_model():
+    """Return singleton instance of the FlashRank reranker"""
+    global _reranker_model
+    if _reranker_model is None:
+        print("[AI-Utils] Loading FlashRank reranker model...")
+        # Optional: Specify model_name if you want a specific one, default is ms-marco-TinyBERT-L-2-v2
+        _reranker_model = Ranker()
+    return _reranker_model
 
 def get_vector_store(db_path, collection_name):
     """Return or create a Chroma vector store instance"""

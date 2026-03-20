@@ -71,21 +71,23 @@ def router_node(state: AgentState):
     agent_name = select_agent(state["learning_style"], state["manual_style"])
     return {"selected_agent": agent_name}
 
-def explainer_node(state: AgentState):
-    """Execute the In-Depth Explainer agent"""
+async def explainer_node(state: AgentState):
+    """Execute the In-Depth Explainer agent without needing the planner"""
     print("--- [GRAPH] EXPLAINER NODE ---")
     try:
-        response = get_explanation(state["enhanced_prompt"], state["learner_summary"])
+        # Pass the raw query directly (agent now fetches prompt rules internally)
+        response = await get_explanation(state["query"], state["learner_summary"])
         return {"response": response}
     except Exception as e:
         print(f"[GRAPH] Explainer node crash: {e}")
         return {"response": "I encountered an error trying to explain that concept. Please try asking in a different way! ⚡"}
 
-def analogy_node(state: AgentState):
-    """Execute the Analogy agent"""
+async def analogy_node(state: AgentState):
+    """Execute the Analogy agent without needing the planner"""
     print("--- [GRAPH] ANALOGY NODE ---")
     try:
-        response = get_analogies(state["enhanced_prompt"], state["learner_summary"])
+        # Pass the raw query directly (agent now fetches prompt rules internally)
+        response = await get_analogies(state["query"], state["learner_summary"])
         return {"response": response}
     except Exception as e:
         print(f"[GRAPH] Analogy node crash: {e}")
@@ -114,7 +116,7 @@ workflow.add_conditional_edges(
     route_intent,
     {
         "casual": "casual",
-        "educational": "planner"
+        "educational": "router" # Completely bypass the planner!
     }
 )
 

@@ -1,48 +1,91 @@
 import os
 import sys
 import json
-from utils.ai_utils import call_ai, get_vector_store
+import asyncio
+from utils.ai_utils import call_ai, get_vector_store, get_reranker_model
 
 # Configuration
 CHROMA_DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "chroma_db_semantic")
 COLLECTION_NAME = "cpp_textbook"
 TOP_K_RESULTS = 7
 
+PROMPT_DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "chroma_db_PROMPT")
+PROMPT_COLLECTION = "prompt_engineering"
+PROMPT_TOP_K = 3
+
 # Removed call_openrouter_api and load_vector_db as they are now in ai_utils
 
-def retrieve_relevant_context(vector_store, query, top_k=TOP_K_RESULTS):
-    """Retrieve relevant chunks from vector database using LangChain"""
-    # Use LangChain's similarity search
-    results = vector_store.similarity_search_with_score(query, k=top_k)
+async def retrieve_relevant_context(vector_store, query, top_k=TOP_K_RESULTS, use_reranker=True):
+    """Retrieve relevant chunks from vector database using LangChain and FlashRank"""
+    
+    # 1. Broad Search: Get more chunks than we need (e.g., 15)
+    fetch_k = top_k * 3 if use_reranker else top_k
+    results = await vector_store.asimilarity_search_with_score(query, k=fetch_k)
     
     if not results:
         return None, []
-    
-    # Format retrieved context
+        
     contexts = []
-    for doc, score in results:
-        contexts.append({
-            'text': doc.page_content,
-            'chapter': doc.metadata.get('chapter', 'Unknown'),
-            'type': doc.metadata.get('type', 'Unknown'),
-            'distance': score
-        })
     
+    if use_reranker:
+        print(f"[Search] Re-ranking {len(results)} chunks with FlashRank...")
+        # Prepare data for FlashRank
+        passages = []
+        for doc, score in results:
+            passages.append({
+                "id": str(len(passages)),
+                "text": doc.page_content,
+                "meta": {
+                    "chapter": doc.metadata.get('chapter', 'Unknown'),
+                    "type": doc.metadata.get('type', 'Unknown'),
+                    "original_distance": float(score)
+                }
+            })
+            
+        ranker = get_reranker_model()
+        
+        # FlashRank requires a RerankRequest object, not a raw dictionary
+        from flashrank import RerankRequest
+        rerank_request = RerankRequest(query=query, passages=passages)
+        
+        # This runs locally and is very fast
+        reranked_results = ranker.rerank(rerank_request)
+        
+        # Take the top_k from the reranked list
+        best_results = reranked_results[:top_k]
+        
+        for br in best_results:
+            contexts.append({
+                'text': br['text'],
+                'chapter': br['meta'].get('chapter', 'Unknown'),
+                'type': br['meta'].get('type', 'Unknown'),
+                'distance': br['score'] # This is the rerank score now
+            })
+    else:
+        # Fallback to standard similarity search
+        for doc, score in results:
+            contexts.append({
+                'text': doc.page_content,
+                'chapter': doc.metadata.get('chapter', 'Unknown'),
+                'type': doc.metadata.get('type', 'Unknown'),
+                'distance': score
+            })
+            
     # Combine all context into one string
     combined_context = "\n\n---\n\n".join([
         f"[Chapter {ctx['chapter']} - {ctx['type']}]\n{ctx['text']}" 
         for ctx in contexts
     ])
 
-    print(f"\n[DEBUG] EMBEDDING DATA RETRIEVED ({len(contexts)} chunks):")
+    print(f"\n[DEBUG] FINAL CONTEXT RETRIEVED ({len(contexts)} chunks):")
     for idx, ctx in enumerate(contexts, 1):
-        print(f"--- Chunk {idx} (Dist: {ctx['distance']:.3f}) ---")
+        print(f"--- Chunk {idx} (Score: {ctx['distance']:.3f}) ---")
         print(f"{ctx['text'][:200]}...")
     print("-------------------------------------------\n")
     
     return combined_context, contexts
 
-def generate_indepth_explanation(query, context, learner_profile=None):
+async def generate_indepth_explanation(query, context, learner_profile=None, prompt_rules=None):
     """Generate comprehensive, in-depth explanation using retrieved context + LLM's knowledge"""
     
     # Build profile context string if provided
@@ -55,12 +98,18 @@ def generate_indepth_explanation(query, context, learner_profile=None):
 
 ⚙️ ADAPTATION INSTRUCTION:
 Use this profile to tailor your explanation. If the student has secondary preferences (e.g., 30% kinesthetic alongside reading), incorporate those elements (e.g., add hands-on code examples).- If they ask who you are, explain you are an AI tutor personalized to their learning style.
-
 """
-    
+
+    prompt_engineering_context = ""
+    if prompt_rules:
+        prompt_engineering_context = f"""
+📚 PROMPT ENGINEERING BEST PRACTICES:
+{prompt_rules}
+"""
+
     if context:
         # Hybrid mode: Use context + general knowledge
-        prompt = f"""You are an expert C++ programming instructor. Provide a clear, focused explanation of this concept.{profile_context}
+        prompt = f"""You are an expert C++ programming instructor. Provide a clear, focused explanation of this concept.{profile_context}{prompt_engineering_context}
 
 [Knowledge] TEXTBOOK CONTENT:
 {context}
@@ -69,25 +118,27 @@ Use this profile to tailor your explanation. If the student has secondary prefer
 {query}
 
 🎯 YOUR TASK:
-Provide a concise yet thorough explanation (300-500 words) that covers:
+Provide a comprehensive explanation (300-500 words) that covers:
 
-1. **Heading**: Use **Bold Text** for section headers (No # or ## symbols)
-2. **What it is**: Clear definition in 1-2 sentences
-3. **How it works**: Key concepts and syntax
-4. **Code Example**: 1-2 practical examples with brief explanations
-5. **Key Points**: A numbered list of 2-3 important things to remember
+1. **What it is**: Clear definition in 1-2 sentences
+2. **How it works**: Key concepts and syntax
+3. **Code Example**: 1-2 practical examples with brief explanations
+4. **Key Points**: A numbered list of 2-3 important things to remember
 
-⚠️ IMPORTANT GUIDELINES:
-- **NO markdown heading symbols** (like # or ##).
-- **NO dashed or equals line separators** (like --- or ===).
-- Use **BOLD text** for all titles and section headers.
-- Total response should be 300-500 words.
-- Use short, readable paragraphs.
+📝 FORMATTING GUIDELINES:
+- Use proper Markdown headings (`#`, `##`, `###`) to structure the response professionally.
+- **Visual Style**: Use relevant emojis (e.g., 💡, 🚀, ⚙️, 📝) at the start of every major heading and key section to make the content pop.
+- **Callouts**: Use Markdown blockquotes (`>`) for "Pro-Tips" or "Key Takeaways" to highlight critical insights.
+- **Interactive Tone**: Use bold text for key terms and maintain a supportive, expert tone throughout.
+- Provide well-commented code blocks with `cpp` syntax highlighting.
+- Use lists (bulleted or numbered) to break down complex steps.
+- Make the output read beautifully like a high-quality technical blog post.
+- End with a friendly closing like: "Keep sparkling! ⚡ — Sparkle AI Team"
 
-Provide your focused explanation now:"""
+Provide your brilliant, formatted explanation now:"""
     else:
         # No relevant context found - use general knowledge
-        prompt = f"""You are an expert C++ programming instructor.{profile_context}
+        prompt = f"""You are an expert C++ programming instructor.{profile_context}{prompt_engineering_context}
 
 [Topic] TOPIC TO EXPLAIN:
 {query}
@@ -95,31 +146,31 @@ Provide your focused explanation now:"""
 [Info] NOTE: No specific content found in the student's textbook.
 
 🎯 YOUR TASK:
-Provide a concise yet thorough explanation (300-500 words) that covers:
+Provide a comprehensive explanation (300-500 words) that covers:
 
 1. **What it is**: Clear definition in 1-2 sentences
 2. **How it works**: Key concepts and syntax  
 3. **Code Example**: 1-2 practical examples with brief explanations
-Provide a detailed, structured explanation of the user's query using your comprehensive C++ knowledge.
 
 📝 FORMATTING GUIDELINES:
-- **NO markdown heading symbols** (like # or ##).
-- **NO dashed or equals line separators** (like --- or ===).
-- Use **BOLD text** for the main title and all section headers.
-- Provide well-commented code blocks with syntax highlighting.
-- End with **Key Takeaways** as a numbered list (1., 2., 3.).
-- Keep it clean and professional.
+- Use proper Markdown headings (`#`, `##`, `###`) to structure the response professionally.
+- **Visual Style**: Use relevant emojis (e.g., 💡, 🚀, ⚙️, 📝) at the start of every major heading.
+- **Callouts**: Use Markdown blockquotes (`>`) for "Quick Insights" or "Key Concepts."
+- **Interactive Tone**: Use bold text for key terms and maintain a supportive, expert tone.
+- Provide well-commented code blocks with `cpp` syntax highlighting.
+- Use lists (bulleted or numbered) to break down complex steps.
+- End with a friendly closing like: "Keep sparkling! ⚡ — Sparkle AI Team"
 
-Provide your focused explanation now:"""
+Provide your brilliant, formatted explanation now:"""
     
-    # Generate explanation using OpenRouter/Gemini
-    explanation = call_ai(prompt)
+    # Generate explanation using OpenRouter/Gemini natively threaded
+    explanation = await asyncio.to_thread(call_ai, prompt)
     if not explanation:
         print("[Explainer] Warning: AI failed, using fallback message")
         return "I'm having trouble generating a detailed explanation right now due to high demand. Please try again in 1-2 minutes! ⚡"
     return explanation.strip()
 
-def get_explanation(question, learner_profile=None):
+async def get_explanation(question, learner_profile=None):
     """Main in-depth explanation function"""
     # Check for greeting tag or short query
     if "[GREETING]" in question or len(question.strip()) < 4:
@@ -134,7 +185,7 @@ def get_explanation(question, learner_profile=None):
     vector_store = get_vector_store(CHROMA_DB_PATH, COLLECTION_NAME)
     
     # Retrieve relevant context
-    context, contexts = retrieve_relevant_context(vector_store, question)
+    context, contexts = await retrieve_relevant_context(vector_store, question)
     
     if context:
         print(f"[OK] Found {len(contexts)} relevant chunks from textbook")
@@ -145,9 +196,19 @@ def get_explanation(question, learner_profile=None):
         print("[Info] No relevant textbook content found")
         print("[Info] Will use comprehensive C++ knowledge for explanation")
     
+    # Load Prompt Engineering Rules
+    print("\n[Search] Searching prompt engineering rules...")
+    try:
+        prompt_store = get_vector_store(PROMPT_DB_PATH, PROMPT_COLLECTION)
+        # We don't need to rerank the prompt rules, just do a normal search
+        prompt_rules, _ = await retrieve_relevant_context(prompt_store, question, top_k=PROMPT_TOP_K, use_reranker=False)
+    except Exception as e:
+        print(f"[Search] Could not load prompt rules: {e}")
+        prompt_rules = None
+
     # Generate in-depth explanation
     print("\n[AI] Generating comprehensive, in-depth explanation...\n")
-    explanation = generate_indepth_explanation(question, context, learner_profile)
+    explanation = await generate_indepth_explanation(question, context, learner_profile, prompt_rules)
     
     print("=" * 70)
     print("[Knowledge] IN-DEPTH EXPLANATION:")
@@ -157,7 +218,7 @@ def get_explanation(question, learner_profile=None):
     
     return explanation
 
-def interactive_mode():
+async def interactive_mode():
     """Interactive in-depth explanation mode"""
     print("\n" + "=" * 70)
     print("[AI] C++ In-Depth Explainer - Interactive Mode")
@@ -175,7 +236,7 @@ def interactive_mode():
         if not question:
             continue
         
-        get_explanation(question)
+        await get_explanation(question)
 
 
 if __name__ == "__main__":
@@ -203,7 +264,7 @@ if __name__ == "__main__":
                 sys.stdout = io_module.StringIO()
                 
                 try:
-                    explanation = get_explanation(query, profile)
+                    explanation = asyncio.run(get_explanation(query, profile))
                 finally:
                     sys.stdout = old_stdout
                 
@@ -233,8 +294,8 @@ if __name__ == "__main__":
         choice = input("\nEnter choice (1 or 2): ").strip()
         
         if choice == "1":
-            interactive_mode()
+            asyncio.run(interactive_mode())
         else:
             for topic in example_topics:
-                get_explanation(topic)
+                asyncio.run(get_explanation(topic))
                 input("\n\nPress Enter for next topic...")

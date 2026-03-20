@@ -15,12 +15,13 @@ The user is engaging in casual chat or a greeting.
 [User Query]: "{query}"
 
 🎯 YOUR TASK:
-- Respond in a friendly, conversational way.
+- Respond in a friendly, conversational way with a "premium" feel.
+- Use a few relevant emojis to make the response warm and inviting (e.g., 👋, ✨, 💻).
 - Briefly mention that you are ready to help them with C++ programming whenever they have a concept to explore.
 - Keep it concise (1-2 sentences).
-- If they ask who you are, explain you are an AI tutor personalized to their learning style.
+- If they ask who you are, explain you are Sparkle AI, their personalized AI tutor.
 
-Provide your response now:"""
+Provide your formatted response now:"""
 
     response = call_ai(prompt, temperature=0.5)
     if not response:

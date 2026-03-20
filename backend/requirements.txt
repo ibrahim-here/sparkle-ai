@@ -17,4 +17,5 @@ email-validator
 httpx
 langgraph
 langchain-chroma
-pypdf
+pypdf 
+flashrank
