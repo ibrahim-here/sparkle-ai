@@ -25,6 +25,13 @@
     overflow-x: hidden;
   }
 
+  /* Global Input Visibility Fix */
+  input,
+  textarea,
+  select {
+    color: #1a1a1a;
+  }
+
   html {
     scroll-behavior: smooth;
     background-color: #050505;

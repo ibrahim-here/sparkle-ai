@@ -111,42 +111,32 @@ Tailor the analogies to this profile. If the student has secondary preferences (
 📝 FORMATTING GUIDELINES:
 - Use proper Markdown headings (`#`, `##`, `###`) to structure the response professionally.
 - **Analogy Headers**: Use `## 🎨 Analogy [Number]: [Creative Name]` for each analogy.
-- **Visual Style**: Use relevant emojis throughout the text to make it engaging and "premium" looking.
-- Use bold text for connections between the analogy and C++ concepts.
+- **Visual Style**: Use relevant emojis throughout the text.
+- Use bold text for connections between the analogy and programming concepts.
 - Use numbered lists (1., 2., 3.) for multi-step breakdowns.
 - Use horizontal dividers (`---`) between different analogies.
-- End with a friendly closing like: "Simplifying complexity, one analogy at a time! ⚡ — Sparkle AI Team"
+- End with: "Simplifying complexity, one analogy at a time! ⚡ — Sparkle AI Team"
 """
 
-    if context:
-        # Hybrid mode: Use context + general knowledge
-        prompt = f"""You are an expert C++ tutor who explains concepts through creative analogies.{profile_context}{prompt_engineering_context}
+    prompt = f"""You are an expert Programming Instructor specialized in **Programming Fundamentals**. Your goal is to explain core concepts through creative, relatable analogies in any programming language (e.g., C++, Python, Java).{profile_context}{prompt_engineering_context}
 
-[Knowledge] TEXTBOOK CONTENT:
-{context}
+[Knowledge] TEXTBOOK CONTENT (C++ SPECIFIC):
+{context if context else "No direct matches found. Use your general knowledge for the requested language."}
 
 [Topic] TOPIC:
 {query}
 
-🎯 YOUR TASK:
-Create 2-3 relatable analogies (250-400 words total) to explain this concept.
-{common_guidelines}
-Provide your formatted analogies now:"""
-    else:
-        # No relevant context found - use general knowledge
-        prompt = f"""You are an expert C++ tutor who explains concepts through creative analogies.{profile_context}{prompt_engineering_context}
-
-[Topic] TOPIC:
-{query}
-
-[Info] NOTE: No textbook content available.
+⚖️ SCOPE & RESTRICTION RULES:
+1. **Fundamentals Only**: You only explain: Variables, Data Types, Operators, Control Structures (Loops, If-Else), Arrays/Lists (1D, 2D), Functions/Methods, Basic Structures/Objects, and File Handling.
+2. **Advanced Topic Rejection**: If the user asks about advanced topics like Dynamic Programming, Graph Theory, AI/ML, or complex system design, you MUST respond exactly with: "My knowledge is focused on programming fundamental topics (loops, arrays, functions, etc.). I cannot assist with advanced algorithmic or specialized architectural topics at this time."
+3. **Multi-Language Support**: Provide analogies in the context of the programming language requested by the user. If they don't specify, use C++.
 
 🎯 YOUR TASK:
 Create 2-3 relatable analogies (250-400 words total) to explain this concept.
 {common_guidelines}
 Provide your formatted analogies now:"""
     
-    # Run AI generation on a background thread so it doesn't freeze the server
+    # Run AI generation on a background thread
     analogies = await asyncio.to_thread(call_ai, prompt, 0.5)
     if not analogies:
         print("[Analogy] Warning: AI failed, using fallback message")
@@ -157,7 +147,7 @@ async def get_analogies(question, learner_profile=None):
     """Main analogy generation function"""
     # Check for greeting tag or short query
     if "[GREETING]" in question or len(question.strip()) < 4:
-        return "Hello there! I am your Sparkle AI Analogy specialized agent. I'm here to translate complex C++ concepts into relatable real-life stories. What coding topic can I simplify for you today? ⚡"
+        return "Hello there! I am your Sparkle AI Analogy specialized agent. I'm here to translate core programming concepts into relatable real-life stories. What coding topic can I simplify for you today? ⚡"
 
     print("\n" + "=" * 60)
     print(f"[Topic] Topic: {question}")
@@ -177,7 +167,7 @@ async def get_analogies(question, learner_profile=None):
             print(f"  [{i}] Chapter {ctx['chapter']} - {ctx['type']}")
     else:
         print("[Info] No relevant textbook content found")
-        print("[Info] Will use general C++ knowledge for analogies")
+        print("[Info] Will use general knowledge for analogies")
     
     # Load Prompt Engineering Rules
     print("\n[Search] Searching prompt engineering rules...")
@@ -204,13 +194,13 @@ async def get_analogies(question, learner_profile=None):
 async def interactive_mode():
     """Interactive analogy generation mode"""
     print("\n" + "=" * 60)
-    print("[AI] C++ Analogy Generator - Interactive Mode")
+    print("[AI] Programming Analogy Generator - Interactive Mode")
     print("=" * 60)
-    print("Enter any C++ concept and get 4-5 real-life analogies!")
+    print("Enter any core programming concept and get relatable real-life analogies!")
     print("Type 'exit' or 'quit' to stop\n")
     
     while True:
-        question = input("\n[Prompt] What C++ concept should I explain?: ").strip()
+        question = input("\n[Prompt] What programming concept should I explain?: ").strip()
         
         if question.lower() in ['exit', 'quit', 'q']:
             print("\n[Bye] Happy learning!")
@@ -266,7 +256,7 @@ if __name__ == "__main__":
         # Test mode when run directly
         example_topics = [
             "loops",
-            "pointers"
+            "arrays"
         ]
         
         print("\n[AI] Analogy Master Ready!")

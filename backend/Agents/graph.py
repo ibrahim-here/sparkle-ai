@@ -3,6 +3,7 @@ from langgraph.graph import StateGraph, END
 from Agents.planner_agent import enhance_prompt
 from Agents.indepth_explainer_agent import get_explanation
 from Agents.analogy_agent import get_analogies
+from Agents.problem_solver_agent import get_problem_solution
 from Agents.general_agent import get_casual_response
 from utils.ai_utils import call_ai
 from utils.agent_router import select_agent
@@ -21,37 +22,30 @@ class AgentState(TypedDict):
 
 # 2. Define Nodes
 def classifier_node(state: AgentState):
-    """Detect if the query is a routine greeting/casual chat or an educational programming question"""
+    """Detect if the query is a routine greeting/casual chat, an educational theory question, or a coding/problem-solving request"""
     print("--- [GRAPH] CLASSIFIER NODE ---")
     prompt = f"""Analyze this user query for a programming tutor.
-Is it a casual greeting/thank you/social chat, or a specific question about programming/C++?
+Is it a casual greeting/social chat? Or is it an educational request?
+
+If it is an educational request, categorize it as ONE of these:
+- 'problem_solving': If the user asks for code, a solution, an implementation, or to solve a specific programming task.
+- 'educational': If the user is asking for an explanation of a concept, how something works, theory, or general knowledge.
 
 Query: "{state['query']}"
 
-Answer ONLY with one word: 'casual' or 'educational'."""
+Answer ONLY with one word: 'casual', 'educational', or 'problem_solving'."""
     
     response = call_ai(prompt)
     
     if response:
         intent = response.lower().strip()
-        return {"intent": 'educational' if 'educational' in intent else 'casual'}
+        # Ensure we return a valid intent
+        if 'problem_solving' in intent: return {"intent": 'problem_solving'}
+        if 'educational' in intent: return {"intent": 'educational'}
+        if 'casual' in intent: return {"intent": 'casual'}
     
-    # Fallback: If API fails (e.g., 429), use a simple keyword guess to avoid crashing
-    print("[GRAPH] API failed, using fallback detection")
-    casual_keywords = {
-        'hi', 'hello', 'hey', 'thanks', 'thank', 'bye', 'who', 'help', 
-        'how', 'are', 'you', 'going', 'sup', 'yo', 'hii', 'test'
-    }
-    query_lower = state['query'].lower()
-    # Check if more than 50% of the words are in casual_keywords or query is very short
-    words = query_lower.split()
-    casual_count = sum(1 for word in words if word in casual_keywords)
-    is_casual = (casual_count / len(words) >= 0.5) if words else True
-    
-    if len(query_lower) < 5:
-        is_casual = True
-        
-    return {"intent": 'casual' if is_casual else 'educational'}
+    # Fallback to educational
+    return {"intent": 'educational'}
 
 def casual_node(state: AgentState):
     """Handle casual greetings and social chat"""
@@ -66,32 +60,40 @@ def planner_node(state: AgentState):
     return {"enhanced_prompt": enhanced}
 
 def router_node(state: AgentState):
-    """Select the most appropriate agent based on learning profile"""
+    """Select the most appropriate agent based on learning profile and query intent"""
     print("--- [GRAPH] ROUTER NODE ---")
-    agent_name = select_agent(state["learning_style"], state["manual_style"])
+    agent_name = select_agent(state["learning_style"], query=state["query"], manual_style=state["manual_style"], detected_intent=state.get("intent"))
     return {"selected_agent": agent_name}
 
 async def explainer_node(state: AgentState):
-    """Execute the In-Depth Explainer agent without needing the planner"""
+    """Execute the In-Depth Explainer agent"""
     print("--- [GRAPH] EXPLAINER NODE ---")
     try:
-        # Pass the raw query directly (agent now fetches prompt rules internally)
         response = await get_explanation(state["query"], state["learner_summary"])
         return {"response": response}
     except Exception as e:
         print(f"[GRAPH] Explainer node crash: {e}")
-        return {"response": "I encountered an error trying to explain that concept. Please try asking in a different way! ⚡"}
+        return {"response": "I encountered an error trying to explain that concept. ⚡"}
 
 async def analogy_node(state: AgentState):
-    """Execute the Analogy agent without needing the planner"""
+    """Execute the Analogy agent"""
     print("--- [GRAPH] ANALOGY NODE ---")
     try:
-        # Pass the raw query directly (agent now fetches prompt rules internally)
         response = await get_analogies(state["query"], state["learner_summary"])
         return {"response": response}
     except Exception as e:
         print(f"[GRAPH] Analogy node crash: {e}")
-        return {"response": "I had a bit of trouble coming up with an analogy just now. Let's try again! ⚡"}
+        return {"response": "I had a bit of trouble coming up with an analogy just now. ⚡"}
+
+async def problem_solver_node(state: AgentState):
+    """Execute the Problem Solver agent"""
+    print("--- [GRAPH] PROBLEM SOLVER NODE ---")
+    try:
+        response = await get_problem_solution(state["query"], state["learner_summary"])
+        return {"response": response}
+    except Exception as e:
+        print(f"[GRAPH] Problem solver node crash: {e}")
+        return {"response": "I encountered an error trying to solve this problem. ⚡"}
 
 # 3. Build the Graph
 workflow = StateGraph(AgentState)
@@ -103,6 +105,7 @@ workflow.add_node("planner", planner_node)
 workflow.add_node("router", router_node)
 workflow.add_node("explainer", explainer_node)
 workflow.add_node("analogy", analogy_node)
+workflow.add_node("problem_solver", problem_solver_node)
 
 # Set Entry Point
 workflow.set_entry_point("classifier")
@@ -116,18 +119,21 @@ workflow.add_conditional_edges(
     route_intent,
     {
         "casual": "casual",
-        "educational": "router" # Completely bypass the planner!
+        "educational": "router",
+        "problem_solving": "router"
     }
 )
 
 # Continue from Planner to Router
 workflow.add_edge("planner", "router")
 
-# Add Conditional Edges for Agent Selection (deterministic as requested)
+# Add Conditional Edges for Agent Selection
 def route_to_agent(state: AgentState):
     agent = state["selected_agent"]
     if agent == "analogy_agent.py":
         return "analogy"
+    elif agent == "problem_solver_agent.py":
+        return "problem_solver"
     return "explainer"
 
 workflow.add_conditional_edges(
@@ -135,6 +141,7 @@ workflow.add_conditional_edges(
     route_to_agent,
     {
         "analogy": "analogy",
+        "problem_solver": "problem_solver",
         "explainer": "explainer"
     }
 )

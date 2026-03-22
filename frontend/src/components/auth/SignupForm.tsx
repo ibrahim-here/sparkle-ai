@@ -64,7 +64,7 @@ const SignupForm = ({ onSuccess }: SignupFormProps) => {
             onChange={handleChange}
             required
             minLength={2}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all text-gray-900"
             placeholder="John Doe"
           />
         </div>
@@ -80,7 +80,7 @@ const SignupForm = ({ onSuccess }: SignupFormProps) => {
             value={formData.email}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all text-gray-900"
             placeholder="you@example.com"
           />
         </div>
@@ -97,7 +97,7 @@ const SignupForm = ({ onSuccess }: SignupFormProps) => {
             onChange={handleChange}
             required
             minLength={8}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all text-gray-900"
             placeholder="••••••••"
           />
           <p className="text-xs text-gray-500 mt-1">Must be at least 8 characters</p>

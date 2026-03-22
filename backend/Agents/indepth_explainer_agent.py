@@ -107,59 +107,31 @@ Use this profile to tailor your explanation. If the student has secondary prefer
 {prompt_rules}
 """
 
-    if context:
-        # Hybrid mode: Use context + general knowledge
-        prompt = f"""You are an expert C++ programming instructor. Provide a clear, focused explanation of this concept.{profile_context}{prompt_engineering_context}
+    prompt = f"""You are an expert Programming Instructor specialized in **Programming Fundamentals**. Your goal is to provide clear, focused explanations of core concepts in any programming language (e.g., C++, Python, Java).{profile_context}{prompt_engineering_context}
 
-[Knowledge] TEXTBOOK CONTENT:
-{context}
+[Knowledge] TEXTBOOK CONTENT (C++ SPECIFIC):
+{context if context else "No direct matches found. Use your general knowledge for the requested language."}
 
 [Topic] TOPIC TO EXPLAIN:
 {query}
 
-🎯 YOUR TASK:
-Provide a comprehensive explanation (300-500 words) that covers:
-
-1. **What it is**: Clear definition in 1-2 sentences
-2. **How it works**: Key concepts and syntax
-3. **Code Example**: 1-2 practical examples with brief explanations
-4. **Key Points**: A numbered list of 2-3 important things to remember
-
-📝 FORMATTING GUIDELINES:
-- Use proper Markdown headings (`#`, `##`, `###`) to structure the response professionally.
-- **Visual Style**: Use relevant emojis (e.g., 💡, 🚀, ⚙️, 📝) at the start of every major heading and key section to make the content pop.
-- **Callouts**: Use Markdown blockquotes (`>`) for "Pro-Tips" or "Key Takeaways" to highlight critical insights.
-- **Interactive Tone**: Use bold text for key terms and maintain a supportive, expert tone throughout.
-- Provide well-commented code blocks with `cpp` syntax highlighting.
-- Use lists (bulleted or numbered) to break down complex steps.
-- Make the output read beautifully like a high-quality technical blog post.
-- End with a friendly closing like: "Keep sparkling! ⚡ — Sparkle AI Team"
-
-Provide your brilliant, formatted explanation now:"""
-    else:
-        # No relevant context found - use general knowledge
-        prompt = f"""You are an expert C++ programming instructor.{profile_context}{prompt_engineering_context}
-
-[Topic] TOPIC TO EXPLAIN:
-{query}
-
-[Info] NOTE: No specific content found in the student's textbook.
+⚖️ SCOPE & RESTRICTION RULES:
+1. **Fundamentals Only**: You only explain: Variables, Data Types, Operators, Control Structures (Loops, If-Else), Arrays/Lists (1D, 2D), Functions/Methods, Basic Structures/Objects, and File Handling.
+2. **Advanced Topic Rejection**: If the user asks about advanced topics like Dynamic Programming, Graph Theory, AI/ML, or complex system design, you MUST respond exactly with: "My knowledge is focused on programming fundamental topics (loops, arrays, functions, etc.). I cannot assist with advanced algorithmic or specialized architectural topics at this time."
+3. **Multi-Language Support**: Provide the explanation in the programming language requested by the user. If they don't specify, use C++. If the textbook context above is C++ and they asked for Python, use the C++ textbook concepts as a logic guide but explain the Python implementation.
 
 🎯 YOUR TASK:
 Provide a comprehensive explanation (300-500 words) that covers:
-
-1. **What it is**: Clear definition in 1-2 sentences
-2. **How it works**: Key concepts and syntax  
-3. **Code Example**: 1-2 practical examples with brief explanations
+1. **What it is**: Clear definition in 1-2 sentences.
+2. **How it works**: Key concepts and syntax in the requested language.
+3. **Code Example**: 1-2 practical examples with brief explanations.
+4. **Key Points**: A list of important things to remember.
 
 📝 FORMATTING GUIDELINES:
-- Use proper Markdown headings (`#`, `##`, `###`) to structure the response professionally.
-- **Visual Style**: Use relevant emojis (e.g., 💡, 🚀, ⚙️, 📝) at the start of every major heading.
-- **Callouts**: Use Markdown blockquotes (`>`) for "Quick Insights" or "Key Concepts."
-- **Interactive Tone**: Use bold text for key terms and maintain a supportive, expert tone.
-- Provide well-commented code blocks with `cpp` syntax highlighting.
-- Use lists (bulleted or numbered) to break down complex steps.
-- End with a friendly closing like: "Keep sparkling! ⚡ — Sparkle AI Team"
+- Use proper Markdown headings (`#`, `##`, `###`).
+- **Visual Style**: Use relevant emojis (💡, 🚀, ⚙️, 📝).
+- **Callouts**: Use blockquotes (`>`) for "Pro-Tips" or "Key Takeaways".
+- End with: "Keep sparkling! ⚡ — Sparkle AI Team"
 
 Provide your brilliant, formatted explanation now:"""
     
@@ -174,7 +146,7 @@ async def get_explanation(question, learner_profile=None):
     """Main in-depth explanation function"""
     # Check for greeting tag or short query
     if "[GREETING]" in question or len(question.strip()) < 4:
-        return "Hello! I am your Sparkle AI learning assistant. I see you're ready to dive into C++! Whenever you have a specific concept or problem you'd like me to explain in-depth, just let me know and I'll tailor the explanation to your neural profile. ⚡"
+        return "Hello! I am your Sparkle AI learning assistant. I see you're ready to dive into programming! Whenever you have a specific concept or problem you'd like me to explain in-depth, just let me know and I'll tailor the explanation to your learning style. ⚡"
 
     print("\n" + "=" * 70)
     print(f"[Topic] Topic for In-Depth Explanation: {question}")
@@ -194,7 +166,7 @@ async def get_explanation(question, learner_profile=None):
             print(f"  [{i}] Chapter {ctx['chapter']} - {ctx['type']}")
     else:
         print("[Info] No relevant textbook content found")
-        print("[Info] Will use comprehensive C++ knowledge for explanation")
+        print("[Info] Will use general knowledge for explanation")
     
     # Load Prompt Engineering Rules
     print("\n[Search] Searching prompt engineering rules...")
@@ -221,13 +193,13 @@ async def get_explanation(question, learner_profile=None):
 async def interactive_mode():
     """Interactive in-depth explanation mode"""
     print("\n" + "=" * 70)
-    print("[AI] C++ In-Depth Explainer - Interactive Mode")
+    print("[AI] Programming In-Depth Explainer - Interactive Mode")
     print("=" * 70)
-    print("Ask about any C++ concept for a comprehensive, detailed explanation!")
+    print("Ask about any core programming concept for a detailed explanation!")
     print("Type 'exit' or 'quit' to stop\n")
     
     while True:
-        question = input("\n[Prompt] What C++ concept should I explain in-depth?: ").strip()
+        question = input("\n[Prompt] What programming concept should I explain in-depth?: ").strip()
         
         if question.lower() in ['exit', 'quit', 'q']:
             print("\n[Bye] Keep learning deeply!")
