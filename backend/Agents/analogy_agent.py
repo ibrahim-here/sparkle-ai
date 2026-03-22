@@ -4,7 +4,7 @@ import json
 from utils.ai_utils import call_ai, get_vector_store
 
 # Configuration
-CHROMA_DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "chroma_db_semantics")
+CHROMA_DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "chroma_db_semantic")
 COLLECTION_NAME = "cpp_textbook"
 TOP_K_RESULTS = 5
 
@@ -61,15 +61,19 @@ Tailor the analogies to this profile. If the student has secondary preferences (
 📝 FORMATTING GUIDELINES:
 - **NO markdown heading symbols** (like # or ##).
 - **NO dashed or equals line separators** (like --- or ===).
-- Use **BOLD text** for the main title and each analogy header (e.g., **Analogy 1: [Name]**).
-- Use **bold text** for connections between the analogy and C++ concepts.
+- Use BOLD text and Proper heading bigger text size like h1 or h2 like we use in react  for the main title and each analogy header (e.g., **Analogy 1: [Name]**).
+- Use bold text for connections between the analogy and C++ concepts.
 - Use numbered lists (1., 2., 3.) for multi-step breakdowns.
 - Keep output clean and optimized for a dark UI.
 """
 
     if context:
         # Hybrid mode: Use context + general knowledge
-        prompt = f"""You are an expert C++ tutor who explains concepts through creative analogies.{profile_context}
+        prompt = f"""You are Sparkle AI, an expert C++ tutor specifically built to teach Programming Fundamentals (PF) who explains concepts through creative analogies.{profile_context}
+
+CRITICAL RULES:
+1. If the topic is entirely outside of Programming Fundamentals (PF) or C++, you MUST politely refuse to answer and remind the user that you only teach PF/C++.
+2. If the user asks you to literally "visualize", "draw", "plot", or "create a flowchart/diagram" for them, tell them they must navigate to "Visualize Mode" on their dashboard to generate interactive logic diagrams. Do not attempt to draw ASCII diagrams.
 
 [Knowledge] TEXTBOOK CONTENT:
 {context}
@@ -80,10 +84,15 @@ Tailor the analogies to this profile. If the student has secondary preferences (
 🎯 YOUR TASK:
 Create 2-3 relatable analogies (250-400 words total) to explain this concept.
 {common_guidelines}
+Format them remove add headings and lists so that its properly formated . Use emojis too to make output look good. remove steric ** or anything that make it seem like written by ai 
 Provide your focused analogies now:"""
     else:
         # No relevant context found - use general knowledge
-        prompt = f"""You are an expert C++ tutor who explains concepts through creative analogies.{profile_context}
+        prompt = f"""You are Sparkle AI, an expert C++ tutor specifically built to teach Programming Fundamentals (PF) who explains concepts through creative analogies.{profile_context}
+
+CRITICAL RULES:
+1. If the topic is entirely outside of Programming Fundamentals (PF) or C++, you MUST politely refuse to answer and remind the user that you only teach PF/C++.
+2. If the user asks you to literally "visualize", "draw", "plot", or "create a flowchart/diagram" for them, tell them they must navigate to "Visualize Mode" on their dashboard to generate interactive logic diagrams. Do not attempt to draw ASCII diagrams.
 
 [Topic] TOPIC:
 {query}

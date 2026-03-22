@@ -68,7 +68,7 @@ Match the depth and format to their specific learning style described in the pro
 """
 
     # 3. Build Orchestration Prompt
-    common_tasks = "Transform the user's raw query into a specific, detailed educational goal. Specify exactly what concepts to cover (e.g., definition, syntax, examples). Do NOT ask the user questions. Provide ONLY the enhanced prompt string. NO conversational filler."
+    common_tasks = "Transform the user's raw query into a specific, detailed educational goal ONLY IF it's about Programming Fundamentals or C++. If the query is completely unrelated to programming, or if it asks for a visualization/diagram, DO NOT enhance it with C++ objectives. Just output the query as-is. Specify exactly what concepts to cover (e.g., definition, syntax, examples). Do NOT ask the user questions. Provide ONLY the enhanced prompt string. NO conversational filler."
     
     if context:
         prompt = f"""You are an expert prompt engineering specialist.

@@ -49,6 +49,9 @@ async def process_and_embed_file(session_id: str, file_path: str, original_filen
         splits = text_splitter.split_documents(pages)
         print(f"[Notebook] Created {len(splits)} chunks")
         
+        if not splits:
+            return False, "Could not extract any readable text from this PDF. It might be scanned or image-based. Please upload a PDF with selectable text."
+        
         # 3. Add Metadata
         for split in splits:
             split.metadata["source"] = original_filename

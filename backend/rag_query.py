@@ -10,7 +10,7 @@ genai.configure(api_key=os.getenv("embedings"))
 model = genai.GenerativeModel("gemini-1.5-flash-latest")
 
 # Configuration
-CHROMA_DB_PATH = "./chroma_db"
+CHROMA_DB_PATH = "./chroma_db_semantic"
 COLLECTION_NAME = "cpp_textbook"
 TOP_K_RESULTS = 5  # Number of relevant chunks to retrieve
 

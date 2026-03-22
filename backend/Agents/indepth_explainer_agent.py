@@ -60,7 +60,11 @@ Use this profile to tailor your explanation. If the student has secondary prefer
     
     if context:
         # Hybrid mode: Use context + general knowledge
-        prompt = f"""You are an expert C++ programming instructor. Provide a clear, focused explanation of this concept.{profile_context}
+        prompt = f"""You are Sparkle AI, an expert C++ programming instructor specifically built to teach Programming Fundamentals (PF). Provide a clear, focused explanation of this concept.{profile_context}
+
+CRITICAL RULES:
+1. If the topic is entirely outside of Programming Fundamentals (PF) or C++, you MUST politely refuse to answer and remind the user that you only teach PF/C++.
+2. If the user asks you to literally "visualize", "draw", "plot", or "create a flowchart/diagram" for them, tell them they must navigate to "Visualize Mode" on their dashboard to generate interactive logic diagrams. Do not attempt to draw ASCII diagrams.
 
 [Knowledge] TEXTBOOK CONTENT:
 {context}
@@ -87,7 +91,11 @@ Provide a concise yet thorough explanation (300-500 words) that covers:
 Provide your focused explanation now:"""
     else:
         # No relevant context found - use general knowledge
-        prompt = f"""You are an expert C++ programming instructor.{profile_context}
+        prompt = f"""You are Sparkle AI, an expert C++ programming instructor specifically built to teach Programming Fundamentals (PF).{profile_context}
+
+CRITICAL RULES:
+1. If the topic is entirely outside of Programming Fundamentals (PF) or C++, you MUST politely refuse to answer and remind the user that you only teach PF/C++.
+2. If the user asks you to literally "visualize", "draw", "plot", or "create a flowchart/diagram" for them, tell them they must navigate to "Visualize Mode" on their dashboard to generate interactive logic diagrams. Do not attempt to draw ASCII diagrams.
 
 [Topic] TOPIC TO EXPLAIN:
 {query}
