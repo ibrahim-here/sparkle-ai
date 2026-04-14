@@ -1,0 +1,46 @@
+(node:19764) ExperimentalWarning: CommonJS module C:\Program Files\nodejs\node_modules\npm\node_modules\debug\src\node.js is loading ES Module C:\Program Files\nodejs\node_modules\npm\node_modules\supports-color\index.js using require().
+Support for loading ES Module in require() is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+E:\FYP\visual-3.0-OG\src\agents\agent3_embeddingRetriever.js
+  64:18  error  'e' is defined but never used  no-unused-vars
+
+E:\FYP\visual-3.0-OG\src\agents\agent6_htmlRenderer.js
+   37:60   error  Unnecessary escape character: \/  no-useless-escape
+  221:85   error  Unnecessary escape character: \'  no-useless-escape
+  221:103  error  Unnecessary escape character: \'  no-useless-escape
+  253:2    error  Unnecessary escape character: \/  no-useless-escape
+
+E:\FYP\visual-3.0-OG\src\components\KonvaDiagramRenderer.jsx
+   41:42  error  Error: Cannot access variable before it is declared
+
+`evaluateExpression` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  39 |                 if (step.state_update) {
+  40 |                     setState(prev => {
+> 41 |                         const newValue = evaluateExpression(step.value_expr, prev);
+     |                                          ^^^^^^^^^^^^^^^^^^ `evaluateExpression` accessed before it is declared
+  42 |                         return { ...prev, [step.state_update]: newValue };
+  43 |                     });
+  44 |                 }
+
+   89 |      * Supports basic arithmetic and state access
+   90 |      */
+>  91 |     const evaluateExpression = (expr, currentState) => {
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  92 |         if (typeof expr !== 'string') return expr;
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  93 |         
+      …
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 115 |         }
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 116 |     };
+      | ^^^^^^^ `evaluateExpression` is declared here
+  117 |
+  118 |     // moved handleAction
+  119 |  react-hooks/immutability
+  111:18  error  'error' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      no-unused-vars
+
+✖ 7 problems (7 errors, 0 warnings)
+

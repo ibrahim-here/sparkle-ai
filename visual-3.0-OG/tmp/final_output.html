@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Functions in C++</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/konva@10.2.0/konva.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0d0d14;color:#CDD6F4;font-family:'Space Grotesk',sans-serif;min-height:100vh;}
+#app{max-width:1200px;margin:0 auto;padding:24px 32px;}
+.header{display:flex;align-items:center;gap:14px;padding-bottom:20px;border-bottom:1px solid #1a1a2e;margin-bottom:20px;}
+.header h1{font-size:1.6rem;font-weight:700;letter-spacing:-0.5px;}
+.tag{background:#89B4FA18;border:1px solid #89B4FA33;color:#89B4FA;font-size:0.68rem;padding:3px 10px;border-radius:20px;font-family:'JetBrains Mono',monospace;letter-spacing:1px;}
+.tab-bar{display:flex;border-bottom:1px solid #1a1a2e;margin-bottom:24px;overflow-x:auto;}
+.tab{background:transparent;border:none;border-bottom:2px solid transparent;color:#6272a4;font-family:'Space Grotesk',sans-serif;font-size:0.78rem;font-weight:600;padding:10px 18px;cursor:pointer;transition:all 0.15s;white-space:nowrap;margin-bottom:-1px;}
+.tab:hover{color:#CDD6F4;}
+.tab.active{color:#89B4FA;border-bottom-color:#89B4FA;}
+.main{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;}
+.milestone-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.m-num{background:#89B4FA;color:#1E1E2E;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.82rem;flex-shrink:0;}
+.m-title{font-size:1.1rem;font-weight:700;letter-spacing:-0.3px;}
+.canvas-wrap{background:#1E1E2E;border:1px solid #252535;border-radius:12px;overflow:hidden;}
+.controls{display:flex;gap:8px;flex-wrap:wrap;padding:12px 14px;background:#13131f;border-top:1px solid #1e1e30;}
+.btn{border:1px solid;font-family:'Space Grotesk',sans-serif;font-size:0.8rem;font-weight:600;padding:7px 16px;border-radius:7px;cursor:pointer;transition:all 0.13s;}
+.btn:active{transform:scale(0.97);}
+.btn.primary{background:#89B4FA18;border-color:#89B4FA55;color:#89B4FA;}
+.btn.primary:hover{background:#89B4FA28;}
+.btn.success{background:#A6E3A118;border-color:#A6E3A155;color:#A6E3A1;}
+.btn.success:hover{background:#A6E3A128;}
+.btn.warning{background:#F9E2AF18;border-color:#F9E2AF55;color:#F9E2AF;}
+.btn.warning:hover{background:#F9E2AF28;}
+.btn.danger{background:#F38BA818;border-color:#F38BA855;color:#F38BA8;}
+.btn.danger:hover{background:#F38BA828;}
+.pills{display:flex;gap:8px;flex-wrap:wrap;padding:8px 14px;background:#0f0f1a;border-top:1px solid #1a1a2e;min-height:34px;}
+.pill{background:#1e1e2e;border-radius:5px;padding:3px 10px;font-size:0.74rem;font-family:'JetBrains Mono',monospace;color:#CDD6F4;}
+.pill span{color:#89B4FA;font-weight:700;}
+.explanation{background:#13131f;border:1px solid #1e1e30;border-radius:10px;padding:20px 22px;position:sticky;top:20px;}
+.explanation-header{font-size:0.66rem;font-weight:700;color:#89B4FA;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;font-family:'JetBrains Mono',monospace;padding-bottom:10px;border-bottom:1px solid #1e1e30;}
+.explanation-body{font-size:0.88rem;line-height:1.8;color:#a6adc8;}
+.explanation-body p{margin-bottom:10px;}
+.explanation-body strong{color:#CDD6F4;}
+.explanation-body code{background:#1e1e2e;color:#A6E3A1;padding:1px 6px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:0.8rem;}
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:14px;border-top:1px solid #1e1e30;}
+.nav-btn{background:#1e1e2e;border:1px solid #2a2a3e;color:#CDD6F4;font-family:'Space Grotesk',sans-serif;font-size:0.8rem;font-weight:600;padding:7px 16px;border-radius:7px;cursor:pointer;}
+.nav-btn:hover{background:#252535;}
+.nav-btn:disabled{opacity:0.2;cursor:not-allowed;}
+.nav-pos{font-size:0.7rem;color:#6272a4;font-family:'JetBrains Mono',monospace;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="header">
+    <h1>Functions in C++</h1>
+    <span class="tag">INTERACTIVE</span>
+  </div>
+  <div class="tab-bar">
+    <button class="tab active" onclick="initMilestone(0)">1. Why Functions?</button>
+    <button class="tab" onclick="initMilestone(1)">2. Anatomy</button>
+    <button class="tab" onclick="initMilestone(2)">3. Execution Flow</button>
+    <button class="tab" onclick="initMilestone(3)">4. void vs Return</button>
+    <button class="tab" onclick="initMilestone(4)">5. Real-World</button>
+  </div>
+  <div class="main">
+    <div>
+      <div class="milestone-header">
+        <div class="m-num" id="m-num">1</div>
+        <div class="m-title" id="m-title">Why Do We Need Functions?</div>
+      </div>
+      <div class="canvas-wrap">
+        <div id="konva-container"></div>
+        <div class="controls" id="controls"></div>
+        <div class="pills" id="pills"></div>
+      </div>
+    </div>
+    <div class="explanation">
+      <div class="explanation-header">Explanation</div>
+      <div class="explanation-body" id="explanation-body"></div>
+      <div class="nav-row">
+        <button class="nav-btn" id="btn-prev" onclick="navigate(-1)" disabled>← Prev</button>
+        <span class="nav-pos" id="nav-pos">1 / 5</span>
+        <button class="nav-btn" id="btn-next" onclick="navigate(1)">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const MILESTONES = [
+  {
+    "milestone_number": 1,
+    "title": "Why Do We Need Functions?",
+    "explanation_html": "<p>Imagine you need to greet a user <strong>three times</strong> in your program. Without functions, you would copy-paste the same code repeatedly — this is messy and hard to fix. A <strong>function</strong> is a named block of code that performs a specific task, and you can <strong>call</strong> it as many times as you want. The diagram shows the problem: duplicated code on the left versus a clean single function on the right. Click <strong>▶ Show Problem</strong> to highlight the repeated code, then see how a function solves it.</p>",
+    "canvas_spec": {
+      "width": 700,
+      "height": 380,
+      "background": "#1E1E2E",
+      "state": {
+        "step": 0
+      },
+      "shapes": [
+        {
+          "type": "Text",
+          "id": "title_lbl",
+          "x": 0,
+          "y": 10,
+          "width": 695,
+          "text": "The Problem: Repeated Code",
+          "fontSize": 16,
+          "fill": "#89B4FA",
+          "fontFamily": "JetBrains Mono",
+          "align": "center",
+          "fontStyle": "normal"
+        },
+        {
+          "type": "Rect",
+          "id": "bad_box",
+          "x": 30,
+          "y": 45,
+          "width": 280,
+          "height": 200,
+          "fill": "#181825",
+          "stroke": "#F38BA8",
+          "strokeWidth": 2,
+          "cornerRadius": 8,
+          "opacity": 1
+        },
+        {
+          "type": "Text",
+          "id": "bad_title",
+          "x": 30,
+          "y": 50,
+          "width": 280,
+          "text": "Without Functions",
+          "fontSize": 13,
+          "fill": "#F38BA8",
+          "fontFamily": "JetBrains Mono",
+          "align": "center",
+          "fontStyle": "normal"
+        },
+        {
+          "type": "Text",
+          "id": "bad_code",
+          "x": 40,
+          "y": 75,
+          "width": 260,
+          "text": "cout << \"Hello!\";\ncout << \"Hello!\";\ncout << \"Hello!\";",
+          "fontSize": 12,
+          "fill": "#CDD6F4",
+          "fontFamily": "JetBrains Mono",
+          "align": "left",
+          "fontStyle": "normal"
+        },
+        {
+          "type": "Text",
+          "id": "bad_note",
+          "x": 40,
+          "y": 165,
+          "width": 260,
+          "text": "Repeated 3 times!\nHard to maintain.",
+          "fontSize": 11,
+          "fill": "#F9E2AF",
+          "fontFamily": "JetBrains Mono",
+          "align": "center",
+          "fontStyle": "normal"
+        },
+        {
+          "type": "Rect",
+          "id": "good_box",
+          "x": 390,
+          "y": 45,
+          "width": 280,
+          "height": 200,
+          "fill": "#181825",
+          "stroke": "#A6E3A1",
+          "strokeWidth": 2,
+          "cornerRadius": 8,
+          "opacity": 1
+        },
+        {
+          "type": "Text",
+          "id": "good_title",
+          "x": 390,
+          "y": 50,
+          "width": 280,
+          "text": "With Functions",
+          "fontSize": 13,
+          "fill": "#A6E3A1",
+          "fontFamily": "JetBrains Mono",
+          "align": "center",
+          "fontStyle": "normal"
+        },
+        {
+          "type": "Text",
+          "id": "good_code",
+          "x": 400,
+          "y": 75,
+          "width": 260,
+          "text": "void greet() {\n  cout << \"Hello!\";\n}\ngreet();\ngreet();\ngreet();",
+          "fontSize": 12,
+          "fill": "#CDD6F4",
+          "fontFamily": "JetBrains Mono",
+          "align": "left",
+          "fontStyle": "normal"
+        },
+        {
+          "type": "Text",
+          "id": "good_note",
+          "x": 400,
+          "y": 185,
+          "width": 260,
+          "text": "Defined once, called 3x!",
+          "fontSize": 11,
+          "fill": "#F9E2AF",
+          "fontFamily": "JetBrains Mono",
+          "align": "center",
+          "fontStyle": "normal"
+        },
+        {
+          "type": "Text",
+          "id": "status_label",
+          "x": 0,
+          "y": 270,
+          "width": 695,
+          "text": "Click ▶ Show Problem to begin.",
+          "fontSize": 13,
+          "fill": "#6272a4",
+          "fontFamily": "JetBrains Mono",
+          "align": "center",
+          "fontStyle": "normal"
+        }
+      ],
+      "buttons": [
+        {
+          "id": "btn_step",
+          "label": "▶ Show Problem",
+          "style": "primary",
+          "action": "stepForward"
+        },
+        {
+          "id": "btn_reset",
+          "label": "↺ Reset",
+          "style": "warning",
+          "action": "reset"
+        }
+      ],
+      "animations": [
+        {
+          "trigger": "stepForward",
+          "steps": [
+            {
+              "state_update": "step",
+              "value_expr": "1"
+            },
+            {
+              "target_id": "bad_box",
+              "property": "stroke",
+              "value_expr": "'#F38BA8'"
+            },
+            {
+              "target_id": "bad_box",
+              "property": "strokeWidth",
+              "value_expr": "4"
+            },
+            {
+              "target_id": "bad_note",
+              "property": "fill",
+              "value_expr": "'#F38BA8'"
+            },
+            {
+              "target_id": "good_box",
+              "property": "strokeWidth",
+              "value_expr": "4"
+            },
+            {
+              "target_id": "good_note",
+              "property": "fill",
+              "value_expr": "'#A6E3A1'"
+            },
+            {
+              "target_id": "status_label",
+              "property": "text",
+              "value_expr": "'Functions eliminate repetition — write once, call many times!'"
+            },
+            {
+              "target_id": "status_label",
+              "property": "fill",
+              "value_expr": "'#A6E3A1'"
+            }
+          ]
+        },
+        {
+          "trigger": "reset",
+          "steps": [
+            {
+              "state_update": "step",
+              "value_expr": "0"
+            },
+            {
+              "target_id": "bad_box",
+              "property": "strokeWidth",
+              "value_expr": "2"
+            },
+            {
+              "target_id": "good_box",
+              "property": "strokeWidth",
+              "value_expr": "2"
+            },
+            {
+              "target_id": "bad_note",
+              "property": "fill",
+              "value_expr": "'#F9E2AF'"
+            },
+            {
+              "target_id": "good_note",
+              "property": "fill",
+              "value_expr": "'#F9E2AF'"
+            },
+            {
+              "target_id": "status_label",
+              "property": "text",
+              "value_expr": "'Click ▶ Show Problem to begin.'"
+            },
+            {
+              "target_id": "status_label",
+              "property": "fill",
+              "value_expr": "'#6272a4'"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "milestone_number": 2,
+    "title": "Anatomy of a Function",
+    "explanation_html": "<p>Every C++ function has four key parts: the <strong>return type</strong> (what value it gives back), the <strong>function name</strong> (how you call it), the <strong>parameters</strong> (inputs inside parentheses), and the <strong>body</strong> (the code block in curly braces). For example, <code>int add(int a, int b) { return a + b; }</code> has return type <code>int</code>, name <code>add</code>, parameters <code>a</code> and <code>b</code>, and a body that returns their sum. The diagram labels each zone of a real function. Click <strong>▶ Highlight Zone</strong> to illuminate each part one by one.</p>",
+    "canvas_spec": {
+      "width": 700,
+      "height": 380,
+      "background": "#1E1E2E",
+      "state": {
+        "zone": 0
+      },
+      "shapes": [
+        {
+          "type": "Text",
+          "id": "title_lbl",
+          "x": 0,
+          "y": 10,
+          "width": 695,
+          "text": "Parts of a C++ Function",
+          "fontSize": 16,
+          "fill": "#89B4FA",
+          "fontFamily": "JetBrains Mono",
+          "align": "center",
+          "fontStyle": "normal"
+        },
+        {
+          "type": "Rect",
+          "id": "ret_box",
+          "x": 50,
+          "y": 60,
+          "width": 80,
+          "height": 44,
+          "fill": "#181825",
+          "stroke": "#6272a4",
+          "strokeWidth": 2,
+          "cornerRadius": 6,
+          "opacity": 1
+        },
+        {
+          "type": "Text",
+          "id": "ret_text",
+          "x": 50,
+          "y": 74,
+          "width": 80,
+          "text": "int",
+          "fontSize": 15,
+          "fill": "#CDD6F4",
+          "fontFamily": "JetBrains Mono",
+          "align": "center",
+          "fontStyle": "normal"
+        },
+        {
+          "type": "Rect",
+          "id": "name_box",
+          "x": 140,
+          "y": 60,
+          "width": 100,
+          "height": 44,
+          "fill": "#181825",
+          "stroke": "#6272a4",
+          "strokeWidth": 2,
+          "cornerRadius": 6,
+          "opacity": 1
+        },
+        {
+          "type": "Text",
+          "id": "name_text",
+          "x": 140,
+          "y": 74,
+          "width": 100,
+          "text": "add",
+          "fontSize": 15,
+          "fill": "#CDD6F4",
+          "fontFamily": "JetBrains Mono",
+          "align": "center",
+          "fontStyle": "normal"
+        },
+        {
+          "type": "Rect",
+          "id": "param_box",
+          "x": 250,
+          "y": 60,
+          "width": 200,
+          "height": 44,
+          "fill": "#181825",
+          "stroke": "#6272a4",
+          "strokeWidth": 2,
+          "cornerRadius": 6,
+          "opacity": 1
+        },
+        {
+          "type": "Text",
+          "id": "param_text",
+          "x": 250,
+          "y": 74,
+          "width": 200,
+          "text": "(int a, int b)",
+          "fontSize": 15,
+          "fill": "#CDD6F4",
+          "fontFamily": "JetBrains Mono",
+          "align": "center",
+          "fontStyle": "normal"
+        },
+        {
+          "type": "Rect",
+          "id": "body_box",
+          "x": 50,
+          "y": 130,
+          "width": 400,
+          "height": 80,
+          "fill": "#181825",
+          "stroke": "#6272a4",
+          "strokeWidth": 2,
+          "cornerRadius": 6,
+          "opacity": 1
+        },
+        {
+          "type": "Text",
+          "id": "body_text",
+          "x": 60,
+          "y": 150,
+          "width": 380,
+          "text": "{ return a + b; }",
+          "fontSize": 15,
+          "fill": "#CDD6F4",
+          "fontFamily": "JetBrains Mono",
+          "align": "left",
+          "fontStyle": "normal"
+        },
+        {
+          "type": "Text",
+          "id": "zone_label",
+          "x": 470,
+          "y": 60,
+          "width": 210,
+          "text": "Zone: —",
+          "fontSize": 13,
+          "fill": "#F9E2AF",
+          "fontFamily": "JetBrains Mono",
+          "align": "left",
+          "fontStyle": "normal"
+        },
+        {
+          "type": "Text",
+          "id": "zone_desc",
+          "x": 470,
+          "y": 90,
+          "width": 210,
+          "text": "Click to highlight\neach part.",
+          "fontSize": 12,
+          "fill": "#6272a4",
+          "fontFamily": "JetBrains Mono",
+          "align": "left",
+          "fontStyle": "normal"
+        },
+        {
+          "type": "Text",
+          "id": "status_label",
+          "x": 0,
+          "y": 330,
+          "width": 695,
+          "text": "Click ▶ Highlight Zone to explore each part.",
+          "fontSize": 13,
+          "fill": "#6272a4",
+          "fontFamily": "JetBrains Mono",
+          "align": "center",
+          "fontStyle": "normal"
+        }
+      ],
+      "buttons": [
+        {
+          "id": "btn_step",
+          "label": "▶ Highlight Zone",
+          "style": "primary",
+          "action": "stepForward"
+        },
+        {
+          "id": "btn_reset",
+          "label": "↺ Reset",
+          "style": "warning",
+          "action": "reset"
+        }
+      ],
+      "animations": [
+        {
+          "trigger": "stepForward",
+          "steps": [
+            {
+              "state_update": "zone",
+              "value_expr": "(state.zone + 1) % 5"
+            },
+            {
+              "target_id": "ret_box",
+              "property": "stroke",
+              "value_expr": "((state.zone + 1) % 5 === 1) ? '#89B4FA' : '#6272a4'"
+            },
+            {
+              "target_id": "name_box",
+              "property": "stroke",
+              "value_expr": "((state.zone + 1) % 5 === 2) ? '#A6E3A1' : '#6272a4'"
+            },
+            {
+              "target_id": "param_box",
+              "property": "stroke",
+              "value_expr": "((state.zone + 1) % 5 === 3) ? '#F9E2AF' : '#6272a4'"
+            },
+            {
+              "target_id": "body_box",
+              "property": "stroke",
+              "value_expr": "((state.zone + 1) % 5 === 4) ? '#F38BA8' : '#6272a4'"
+            },
+            {
+              "target_id": "zone_label",
+              "property": "text",
+              "value_expr": "['Zone: —','Zone: Return Type','Zone: Name','Zone: Parameters','Zone: Body'][(state.zone + 1) % 5]"
+            },
+            {
+              "target_id": "zone_desc",
+              "property": "text",
+              "value_expr": "['Click to highlight each part.','int = returns an integer','add = the function name','(int a, int b) = inputs','{ return a+b; } = logic'][((state.zone + 1) % 5)]"
+            },
+            {
+              "target_id": "status_label",
+              "property": "text",
+              "value_expr": "['All parts explored! Reset to restart.','Return type tells what value comes back.','Name is how you call the function.','Parameters are the inputs.','Body contains the actual code.'][((state.zone + 1) % 5)]"
+            },
+            {
+              "target_id": "status_label",
+              "property": "fill",
+              "value_expr": "((state.zone + 1) % 5 === 0) ? '#6272a4' : '#A6E3A1'"
+            }
+          ]
+        },
+        {
+          "trigger": "reset",
+          "steps": [
+            {
+              "state_update": "zone",
+              "value_expr": "0"
+            },
+            {
+              "target_id": "ret_box",
+              "property": "stroke",
+              "value_expr": "'#6272a4'"
+            },
+            {
+              "target_id": "name_box",
+              "property": "stroke",
+              "value_expr": "'#6272a4'"
+            },
+            {
+              "target_id": "param_box",
+              "property": "stroke",
+              "value_expr": "'#6272a4'"
+            },
+            {
+              "target_id": "body_box",
+              "property": "stroke",
+              "value_expr": "'#6272a4'"
+            },
+            {
+              "target_id": "zone_label",
+              "property": "text",
+              "value_expr": "'Zone: —'"
+            },
+            {
+              "target_id": "zone_desc",
+              "property": "text",
+              "value_expr": "'Click to highlight\\neach part.'"
+            },
+            {
+              "target_id": "status_label",
+              "property": "text",
+              "value_expr": "'Click ▶ Highlight Zone to explore each part.'"
+            },
+            {
+              "target_id": "status_label",
+              "property": "fill",
+              "value_expr": "'#6272a4'"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "milestone_number": 3,
+    "title": "Function Execution Step by Step",
+    "explanation_html": "<p>When a program <strong>calls</strong> a function, execution jumps from the call site into the function body, runs the code, and then <strong>returns</strong> back to where it left off. This is called the <strong>call-return flow</strong>. The diagram shows <code>main()</code> calling <code>add(3, 4)</code> — watch the execution pointer move through each step. Click <strong>▶ Run One Step</strong> to advance the pointer and see what happens at each stage of the function call.</p>",
+    "canvas_spec": {
+      "width": 700,
+      "height": 380,
+      "background": "#1E1E2E",
+      "state": {
+        "step": 0
+      },
+      "shapes": [
+        {
+          "type": "Text",
+          "id": "title_lbl",
+          "x": 0,
+          "y": 8,
+          "width": 695,
+          "text": "Function Call Flow",
+          "fontSize": 15,
+          "fill": "#89B4FA",
+          "fontFamily": "JetBrains Mono",
+          "align": "center",
+          "fontStyle": "normal"
+        },
+        {
+          "type": "Rect",
+          "id": "main_box",
+          "x": 30,
+          "y": 40,
+          "width": 240,
+          "height": 200,
+          "fill": "#181825",
+          "stroke": "#89B4FA",
+          "strokeWidth": 2,
+          "cornerRadius": 8,
+          "opacity": 1
+        },
+        {
+          "type": "Text",
+          "id": "main_title",
+          "x": 30,
+          "y": 45,
+          "width": 240,
+          "text": "main()",
+          "fontSize": 13,
+          "fill": "#89B4FA",
+          "fontFamily": "JetBrains Mono",
+          "align": "center",
+          "fontStyle": "normal"
+        },
+        {
+          "type": "Text",
+          "id": "line1",
+          "x": 45,
+          "y": 75,
+          "width": 210,
+          "text": "1: int result;",
+          "fontSize": 12,
+          "fill": "#CDD6F4",
+          "fontFamily": "JetBrains Mono",
+          "align": "left",
+          "fontStyle": "normal"
+        },
+        {
+          "type": "Text",
+          "id": "line2",
+          "x": 45,
+          "y": 100,
+          "width": 210,
+          "text": "2: result = add(3,4);",
+          "fontSize": 12,
+          "fill": "#CDD6F4",
+          "fontFamily": "JetBrains Mono",
+          "align": "left",
+          "fontStyle": "normal"
+        },
+        {
+          "type": "Text",
+          "id": "line3",
+          "x": 45,
+          "y": 125,
+          "width": 210,
+          "text": "3: cout << result;",
+          "fontSize": 12,
+          "fill": "#CDD6F4",
+          "fontFamily": "JetBrains Mono",
+          "align": "left",
+          "fontStyle": "normal"
+        },
+        {
+          "type": "Rect",
+          "id": "add_box",
+          "x": 420,
+          "y": 40,
+          "width": 240,
+          "height": 200,
+          "fill": "#181825",
+          "stroke": "#A6E3A1",
+          "strokeWidth": 2,
+          "cornerRadius": 8,
+          "opacity": 1
+        },
+        {
+          "type": "Text",
+          "id": "add_title",
+          "x": 420,
+          "y": 45,
+          "width": 240,
+          "text": "add(int a, int b)",
+          "fontSize": 13,
+          "fill": "#A6E3A1",
+          "fontFamily": "JetBrains Mono",
+          "align": "center",
+          "fontStyle": "normal"
+        },
+        {
+          "type": "Text",
+          "id": "add_line1",
+          "x": 435,
+          "y": 75,
+          "width": 210,
+          "text":

@@ -1,0 +1,11 @@
+file:///E:/FYP/visual-3.0-OG/src/agents/agent3_embeddingRetriever.js:9
+const chapters = import.meta.glob('../data/chapter/*.jsonl', { query: '?raw', eager: true });
+                             ^
+
+TypeError: (intermediate value).glob is not a function
+    at file:///E:/FYP/visual-3.0-OG/src/agents/agent3_embeddingRetriever.js:9:30
+    at ModuleJob.run (node:internal/modules/esm/module_job:271:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:547:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+
+Node.js v23.3.0
