@@ -1,0 +1,92 @@
+(node:15628) ExperimentalWarning: CommonJS module C:\Program Files\nodejs\node_modules\npm\node_modules\debug\src\node.js is loading ES Module C:\Program Files\nodejs\node_modules\npm\node_modules\supports-color\index.js using require().
+Support for loading ES Module in require() is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+E:\FYP\visual-3.0-OG\src\agents\agent1_promptEngineer.js
+  106:38  error  'validKeys' is defined but never used  no-unused-vars
+
+E:\FYP\visual-3.0-OG\src\agents\agent2_scopeValidator.js
+  10:26  error  'enriched_query' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+E:\FYP\visual-3.0-OG\src\agents\agent3_embeddingRetriever.js
+  64:18  error  'e' is defined but never used  no-unused-vars
+
+E:\FYP\visual-3.0-OG\src\agents\agent4_diagramPhilosopher.js
+  11:26  error  'enriched_query' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+E:\FYP\visual-3.0-OG\src\agents\agent5_konvaGenerator.js
+  492:5   error  'concept_key' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u       no-unused-vars
+  494:5   error  'retrieved_chunks' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  685:17  error  Unexpected control character(s) in regular expression: \x00, \x1f                                 no-control-regex
+  739:10  error  'extractAndParseJSON' is defined but never used. Allowed unused vars must match /^[A-Z_]/u        no-unused-vars
+
+E:\FYP\visual-3.0-OG\src\agents\agent6_htmlRenderer.js
+   39:60   error  Unnecessary escape character: \/  no-useless-escape
+  223:85   error  Unnecessary escape character: \'  no-useless-escape
+  223:103  error  Unnecessary escape character: \'  no-useless-escape
+  255:2    error  Unnecessary escape character: \/  no-useless-escape
+
+E:\FYP\visual-3.0-OG\src\components\DynamicMilestoneDashboard.jsx
+  17:70  error  'concept' is assigned a value but never used  no-unused-vars
+
+E:\FYP\visual-3.0-OG\src\components\KonvaDiagramRenderer.jsx
+   1:79  error  'useMemo' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          no-unused-vars
+  25:9   error  Error: Cannot access variable before it is declared
+
+`handleAction` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  23 |
+  24 |     useImperativeHandle(ref, () => ({
+> 25 |         handleAction,
+     |         ^^^^^^^^^^^^ `handleAction` accessed before it is declared
+  26 |         resetDiagram: () => initialize(diagramData)
+  27 |     }));
+  28 |
+
+   68 |     };
+   69 |
+>  70 |     const handleAction = async (actionId) => {
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  71 |         console.log(`Action Triggered: ${actionId}`);
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  72 |         
+      …
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 115 |         }
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 116 |     };
+      | ^^^^^^^ `handleAction` is declared here
+  117 |
+  118 |     if (!diagramData) return (
+  119 |         <div className="flex items-center justify-center p-12 text-white/20 font-mono text-sm">  react-hooks/immutability
+  26:29  error  Error: Cannot access variable before it is declared
+
+`initialize` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  24 |     useImperativeHandle(ref, () => ({
+  25 |         handleAction,
+> 26 |         resetDiagram: () => initialize(diagramData)
+     |                             ^^^^^^^^^^ `initialize` accessed before it is declared
+  27 |     }));
+  28 |
+  29 |     const initialize = (spec) => {
+
+  27 |     }));
+  28 |
+> 29 |     const initialize = (spec) => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 30 |         if (!spec) return;
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 31 |         setState(JSON.parse(JSON.stringify(spec.state || {})));
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 32 |         setShapes(JSON.parse(JSON.stringify(spec.shapes || [])));
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 33 |     };
+     | ^^^^^^^ `initialize` is declared here
+  34 |
+  35 |     useEffect(() => {
+  36 |         initialize(diagramData);                                                                     react-hooks/immutability
+  63:18  error  'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           no-unused-vars
+
+✖ 17 problems (17 errors, 0 warnings)
+

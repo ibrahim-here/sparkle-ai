@@ -1,0 +1,364 @@
+[
+    {
+        "week": 1,
+        "lectures": [
+            {
+                "id": 1,
+                "title": "Course Intro, Computer Architecture, Memory",
+                "topics": [
+                    "computer architecture",
+                    "memory",
+                    "fetch-decode-execute",
+                    "ALU",
+                    "storage"
+                ]
+            },
+            {
+                "id": 2,
+                "title": "Programming Languages, Variables, Assignment",
+                "topics": [
+                    "programming languages",
+                    "compiling",
+                    "linking",
+                    "loading",
+                    "variables",
+                    "assignment"
+                ]
+            }
+        ]
+    },
+    {
+        "week": 2,
+        "lectures": [
+            {
+                "id": 3,
+                "title": "C++ Program Structure, Data Types",
+                "topics": [
+                    "cpp structure",
+                    "namespaces",
+                    "datatypes",
+                    "int",
+                    "float",
+                    "double",
+                    "char",
+                    "bool"
+                ]
+            },
+            {
+                "id": 4,
+                "title": "Logical Operations, IF Statements",
+                "topics": [
+                    "logical operations",
+                    "conditional execution",
+                    "IF statements",
+                    "operators"
+                ]
+            }
+        ]
+    },
+    {
+        "week": 3,
+        "lectures": [
+            {
+                "id": 5,
+                "title": "Operator Precedence, Complex Expressions",
+                "topics": [
+                    "operator precedence",
+                    "expressions",
+                    "sequences"
+                ]
+            },
+            {
+                "id": 6,
+                "title": "Clean Code, Indentation, Comments",
+                "topics": [
+                    "clean code",
+                    "indentation",
+                    "comments"
+                ]
+            }
+        ]
+    },
+    {
+        "week": 4,
+        "lectures": [
+            {
+                "id": 7,
+                "title": "Nested Selection, If/Else",
+                "topics": [
+                    "nested selection",
+                    "if/else"
+                ]
+            },
+            {
+                "id": 8,
+                "title": "Nested If/Else Programs",
+                "topics": [
+                    "nested if/else"
+                ]
+            }
+        ]
+    },
+    {
+        "week": 5,
+        "lectures": [
+            {
+                "id": 9,
+                "title": "While, For, Do-While Loops",
+                "topics": [
+                    "while loop",
+                    "for loop",
+                    "do-while loop",
+                    "repetition"
+                ]
+            },
+            {
+                "id": 10,
+                "title": "Problem Solving with Loops",
+                "topics": [
+                    "loop problem solving"
+                ]
+            }
+        ]
+    },
+    {
+        "week": 6,
+        "lectures": [
+            {
+                "id": 11,
+                "title": "Nested Repetition Structures",
+                "topics": [
+                    "nested loops",
+                    "nested repetition"
+                ]
+            },
+            {
+                "id": 12,
+                "title": "Problem Solving with Nested Repetition",
+                "topics": [
+                    "nested loop exercises"
+                ]
+            }
+        ]
+    },
+    {
+        "week": 7,
+        "lectures": [
+            {
+                "id": 13,
+                "title": "Functions, Parameters, Return Types",
+                "topics": [
+                    "functions",
+                    "parameters",
+                    "return types",
+                    "scope",
+                    "lifetime"
+                ]
+            },
+            {
+                "id": 14,
+                "title": "Pass by Value, Pass by Reference, Stack",
+                "topics": [
+                    "pass by value",
+                    "pass by reference",
+                    "stack",
+                    "recursion intro"
+                ]
+            }
+        ]
+    },
+    {
+        "week": 8,
+        "lectures": [
+            {
+                "id": 15,
+                "title": "Top-Down Design, Built-in Functions",
+                "topics": [
+                    "top-down design",
+                    "built-in functions"
+                ]
+            },
+            {
+                "id": 16,
+                "title": "Function Overloading, Default Parameters",
+                "topics": [
+                    "function overloading",
+                    "default parameters"
+                ]
+            }
+        ]
+    },
+    {
+        "week": 9,
+        "lectures": [
+            {
+                "id": 17,
+                "title": "File Handling (I/O)",
+                "topics": [
+                    "text files",
+                    "ifstream",
+                    "ofstream"
+                ]
+            },
+            {
+                "id": 18,
+                "title": "Fixed-size Arrays, Memory Organization",
+                "topics": [
+                    "arrays",
+                    "memory layout",
+                    "element access"
+                ]
+            }
+        ]
+    },
+    {
+        "week": 10,
+        "lectures": [
+            {
+                "id": 19,
+                "title": "Array Processing, Search",
+                "topics": [
+                    "array indexing",
+                    "min/max/avg",
+                    "linear search",
+                    "binary search"
+                ]
+            },
+            {
+                "id": 20,
+                "title": "Arrays in Functions, Shifting, Rotation",
+                "topics": [
+                    "arrays in functions",
+                    "shifting",
+                    "rotation",
+                    "insert/delete"
+                ]
+            }
+        ]
+    },
+    {
+        "week": 11,
+        "lectures": [
+            {
+                "id": 21,
+                "title": "Bubble Sort, Selection Sort",
+                "topics": [
+                    "bubble sort",
+                    "selection sort"
+                ]
+            },
+            {
+                "id": 22,
+                "title": "Insertion Sort, Sets Operations",
+                "topics": [
+                    "insertion sort",
+                    "sets",
+                    "merging"
+                ]
+            }
+        ]
+    },
+    {
+        "week": 12,
+        "lectures": [
+            {
+                "id": 23,
+                "title": "CStrings and Character Arrays",
+                "topics": [
+                    "cstrings",
+                    "null terminator",
+                    "character arrays"
+                ]
+            },
+            {
+                "id": 24,
+                "title": "String Length, Compare, Search/Replace",
+                "topics": [
+                    "strlen",
+                    "strcmp",
+                    "find/replace"
+                ]
+            }
+        ]
+    },
+    {
+        "week": 13,
+        "lectures": [
+            {
+                "id": 25,
+                "title": "2D Arrays Memory Layout, Initialization",
+                "topics": [
+                    "2d arrays",
+                    "row-major",
+                    "col-major",
+                    "matrix init"
+                ]
+            },
+            {
+                "id": 26,
+                "title": "2D Array Applications",
+                "topics": [
+                    "2d array processing",
+                    "sorting rows/cols"
+                ]
+            }
+        ]
+    },
+    {
+        "week": 14,
+        "lectures": [
+            {
+                "id": 27,
+                "title": "2D Arrays in Functions, Diagonal Processing",
+                "topics": [
+                    "passing 2d arrays",
+                    "diagonal processing"
+                ]
+            },
+            {
+                "id": 28,
+                "title": "Matrix Math, Header Files",
+                "topics": [
+                    "matrix multiplication",
+                    "matrix addition",
+                    "headers"
+                ]
+            }
+        ]
+    },
+    {
+        "week": 15,
+        "lectures": [
+            {
+                "id": 29,
+                "title": "2D CStrings, Bitwise, Binary Files",
+                "topics": [
+                    "bitwise operators",
+                    "binary files",
+                    "data compression"
+                ]
+            }
+        ]
+    },
+    {
+        "week": 16,
+        "lectures": [
+            {
+                "id": 30,
+                "title": "Structs Introduction",
+                "topics": [
+                    "structs",
+                    "member access"
+                ]
+            },
+            {
+                "id": 31,
+                "title": "Arrays of Structs",
+                "topics": [
+                    "struct arrays",
+                    "struct applications"
+                ]
+            }
+        ]
+    }
+]
