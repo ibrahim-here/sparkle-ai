@@ -65,7 +65,7 @@ async def retrieve_relevant_context(vector_store, query, top_k=TOP_K_RESULTS, us
     
     return combined_context, contexts
 
-async def generate_problem_solution(query, context, learner_profile=None, prompt_rules=None):
+async def generate_problem_solution(query, context, learner_profile=None, prompt_rules=None, history=None):
     """Generate a step-by-step solution for a programming problem"""
     
     profile_context = ""
@@ -76,7 +76,15 @@ async def generate_problem_solution(query, context, learner_profile=None, prompt
     if prompt_rules:
         prompt_engineering_context = f"\n📚 PROMPT ENGINEERING BEST PRACTICES:\n{prompt_rules}\n"
 
-    prompt = f"""You are an expert Programming Instructor and Problem Solver specialized in **Programming Fundamentals**. Your goal is to help a student solve and understand core concepts in any programming language (e.g., C++, Python, Java, etc.).{profile_context}{prompt_engineering_context}
+    history_context = ""
+    if history and len(history) > 0:
+        history_context = "\n[Conversation History - For Context]:\n"
+        for msg in history:
+            role = "USER" if msg["role"] == "user" else "AI"
+            history_context += f"{role}: {msg['content']}\n"
+        history_context += "\nCRITICAL: Use the above context to understand what topic the user is asking about.\n"
+
+    prompt = f"""You are an expert Programming Instructor and Problem Solver specialized in **Programming Fundamentals**. Your goal is to help a student solve and understand core concepts in any programming language (e.g., C++, Python, Java, etc.).{profile_context}{prompt_engineering_context}{history_context}
 
 [Topic] PROBLEM TO SOLVE:
 {query}
@@ -103,25 +111,29 @@ async def generate_problem_solution(query, context, learner_profile=None, prompt
 
 Provide your solution now:"""
     
-    solution = await asyncio.to_thread(call_ai, prompt)
+    # Use the specific problem solving API key with fallback
+    problem_solving_key = os.getenv("problem_solving") or os.getenv("PROBLEM_SOLVING_BACKUP")
+    solution = await asyncio.to_thread(call_ai, prompt, api_key=problem_solving_key)
     if not solution:
         return "I encountered an error while trying to solve this problem. Let's try again! ⚡"
     return solution.strip()
 
-async def get_problem_solution(question, learner_profile=None):
+async def get_problem_solution(question, learner_profile=None, history=None):
     """Main problem solver entry point"""
     print(f"\n[Problem Solver] Analyzing problem: {question}")
     
     vector_store = get_vector_store(CHROMA_DB_PATH, COLLECTION_NAME)
     context, _ = await retrieve_relevant_context(vector_store, question)
     
-    try:
-        prompt_store = get_vector_store(PROMPT_DB_PATH, PROMPT_COLLECTION)
-        prompt_rules, _ = await retrieve_relevant_context(prompt_store, question, top_k=PROMPT_TOP_K, use_reranker=False)
-    except:
-        prompt_rules = None
+    # Load Prompt Engineering Rules (Commented out to reduce delay)
+    # try:
+    #     prompt_store = get_vector_store(PROMPT_DB_PATH, PROMPT_COLLECTION)
+    #     prompt_rules, _ = await retrieve_relevant_context(prompt_store, question, top_k=PROMPT_TOP_K, use_reranker=False)
+    # except:
+    #     prompt_rules = None
+    prompt_rules = None
 
-    solution = await generate_problem_solution(question, context, learner_profile, prompt_rules)
+    solution = await generate_problem_solution(question, context, learner_profile, prompt_rules, history)
     return solution
 
 if __name__ == "__main__":

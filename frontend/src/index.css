@@ -150,4 +150,59 @@
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
+
+  /* ── Sparkle Markdown Renderer Styles ─────────────────── */
+  .sparkle-markdown {
+    line-height: 1.7;
+  }
+
+  .sparkle-markdown > * + * {
+    margin-top: 0.5rem;
+  }
+
+  .sparkle-markdown ul > li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .sparkle-markdown ol {
+    padding-left: 1.25rem;
+  }
+
+  .sparkle-markdown ol > li {
+    padding-left: 0.25rem;
+  }
+
+  /* Fade-in reveal for message content */
+  @keyframes sparkle-reveal {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .sparkle-markdown {
+    animation: sparkle-reveal 0.35s ease-out forwards;
+  }
+
+  /* Bounce dots for typing indicator */
+  @keyframes bounce-dot {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+
+  /* Slide-in chips */
+  @keyframes chips-reveal {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .chips-animate {
+    animation: chips-reveal 0.4s ease-out 0.3s both;
+  }
 }

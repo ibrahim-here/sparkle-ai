@@ -12,7 +12,7 @@ const agents = [
     },
     {
         id: 'analogy',
-        name: 'Analogy Architect',
+        name: 'Analogy Master',
         description: 'Maps abstract technical concepts to familiar real-world mental models for intuitive grasping.',
         icon: Zap,
         color: '#00F0FF',
@@ -20,7 +20,7 @@ const agents = [
     },
     {
         id: 'visual',
-        name: 'Visual Synthesizer',
+        name: 'Visualizer Agent',
         description: 'Generates mental blueprints and spatial representations of data flows and systems.',
         icon: Eye,
         color: '#FF00E5',

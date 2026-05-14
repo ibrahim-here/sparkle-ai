@@ -17,12 +17,17 @@
     "framer-motion": "^12.23.24",
     "gsap": "^3.13.0",
     "highlight.js": "^11.11.1",
+    "konva": "^10.2.5",
     "lucide-react": "^0.553.0",
     "marked": "^17.0.3",
     "marked-highlight": "^2.2.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-konva": "^19.2.3",
+    "react-markdown": "^10.1.0",
     "react-router-dom": "^7.9.6",
+    "react-syntax-highlighter": "^16.1.1",
+    "remark-gfm": "^4.0.1",
     "uuid": "^13.0.0"
   },
   "devDependencies": {

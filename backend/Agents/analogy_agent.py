@@ -2,7 +2,8 @@ import os
 import sys
 import json
 import asyncio
-from utils.ai_utils import call_ai, get_vector_store, get_reranker_model
+from utils.ai_utils import call_groq, get_vector_store, get_reranker_model
+# from utils.ai_utils import call_ai, get_vector_store, get_reranker_model
 
 # Configuration
 CHROMA_DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "chroma_db_semantic")
@@ -85,7 +86,7 @@ async def retrieve_relevant_context(vector_store, query, top_k=TOP_K_RESULTS, us
     
     return combined_context, contexts
 
-async def generate_analogies(query, context, learner_profile=None, prompt_rules=None):
+async def generate_analogies(query, context, learner_profile=None, prompt_rules=None, history=None):
     """Generate real-life analogies using retrieved context + LLM's knowledge"""
     
     # Build profile context string if provided
@@ -99,6 +100,14 @@ async def generate_analogies(query, context, learner_profile=None, prompt_rules=
 ⚙️ ADAPTATION INSTRUCTION:
 Tailor the analogies to this profile. If the student has secondary preferences (e.g., 40% reading), blend analogies with detailed explanations.
 """
+
+    history_context = ""
+    if history and len(history) > 0:
+        history_context = "\n[Conversation History - For Context]:\n"
+        for msg in history:
+            role = "USER" if msg["role"] == "user" else "AI"
+            history_context += f"{role}: {msg['content']}\n"
+        history_context += "\nCRITICAL: Use the above context to understand what topic the user is asking about. If they ask for 'more examples' or 'a quiz', refer to the most recently discussed topic.\n"
 
     prompt_engineering_context = ""
     if prompt_rules:
@@ -118,7 +127,7 @@ Tailor the analogies to this profile. If the student has secondary preferences (
 - End with: "Simplifying complexity, one analogy at a time! ⚡ — Sparkle AI Team"
 """
 
-    prompt = f"""You are an expert Programming Instructor specialized in **Programming Fundamentals**. Your goal is to explain core concepts through creative, relatable analogies in any programming language (e.g., C++, Python, Java).{profile_context}{prompt_engineering_context}
+    prompt = f"""You are the **Analogy Master** agent of Sparkle AI, a world-class programming educator who specializes in turning abstract code concepts into unforgettable, vivid real-life stories.{profile_context}{prompt_engineering_context}{history_context}
 
 [Knowledge] TEXTBOOK CONTENT (C++ SPECIFIC):
 {context if context else "No direct matches found. Use your general knowledge for the requested language."}
@@ -131,23 +140,71 @@ Tailor the analogies to this profile. If the student has secondary preferences (
 2. **Advanced Topic Rejection**: If the user asks about advanced topics like Dynamic Programming, Graph Theory, AI/ML, or complex system design, you MUST respond exactly with: "My knowledge is focused on programming fundamental topics (loops, arrays, functions, etc.). I cannot assist with advanced algorithmic or specialized architectural topics at this time."
 3. **Multi-Language Support**: Provide analogies in the context of the programming language requested by the user. If they don't specify, use C++.
 
-🎯 YOUR TASK:
-Create 2-3 relatable analogies (250-400 words total) to explain this concept.
-{common_guidelines}
-Provide your formatted analogies now:"""
+🎯 YOUR TASK — Create 2 RICH, LAYERED ANALOGIES (500-700 words total):
+
+Each analogy MUST follow this exact structure:
+
+---
+
+## 🎨 Analogy [N]: [Creative, Catchy Name]
+
+### 🌍 The Story
+Paint a VIVID, SPECIFIC real-life scenario in 3-5 sentences. Use concrete details — real places, real actions, real sensory details. DON'T say "think of a container." DO say "Imagine you're managing a flight check-in desk at a busy airport..."
+
+### 🔗 The Mapping
+
+| Real World | In Code | Why It Matches |
+|------------|---------|----------------|
+| (specific real thing) | (exact code concept) | (one sentence why) |
+| ... | ... | ... |
+
+_(Provide 3-5 rows. Be specific — reference actual items from your story, not generic labels.)_
+
+### 💻 See It in Code
+Provide 4-8 lines of code where **comments reference your analogy directly**:
+\`\`\`cpp
+// (reference your story in the comment)
+int passengers[50]; // 50 seats on the plane, like the check-in roster
+\`\`\`
+
+### ⚠️ Where This Analogy Breaks
+One honest sentence about where this metaphor stops working perfectly. This shows students you respect their intelligence and builds deeper understanding.
+
+---
+
+_(Repeat the full structure above for Analogy 2. The second analogy should illuminate a DIFFERENT aspect of the concept — e.g., if Analogy 1 covers WHAT it is, Analogy 2 should cover HOW or WHY it works.)_
+
+---
+
+## 🚀 Connecting the Dots
+In 2-3 sentences, connect both analogies to the actual code. What is the single most important insight the student should walk away with?
+
+📝 ABSOLUTE FORMATTING RULES:
+- NEVER use generic analogies ("like a box", "like a container", "like a list"). Always use specific, immersive scenarios.
+- Use culturally relatable scenarios: gaming, food, travel, school, sports, social media, music — pick what fits best.
+- Analogy 1 = explains the CONCEPT (the what/why). Analogy 2 = explains the MECHANICS (the how).
+- ALL code must be in fenced code blocks with language tag: \`\`\`cpp ... \`\`\`
+- Use **bold** for the first mention of every key programming term.
+- Use horizontal rules (---) between the two analogies.
+- End with: "Simplifying complexity, one analogy at a time! ⚡ — Sparkle AI Team"
+
+Provide your two rich, memorable analogies now:"""
     
-    # Run AI generation on a background thread
-    analogies = await asyncio.to_thread(call_ai, prompt, 0.5)
+    # Run AI generation on a background thread using Groq instead of Gemini
+    primary_key = os.getenv("grok_api_analogy")
+    backup_key = os.getenv("grok_api_analogy_backup")
+    analogies = await asyncio.to_thread(call_groq, prompt, 0.2, primary_key, backup_key)
+    # analogies = await asyncio.to_thread(call_ai, prompt, 0.5)
     if not analogies:
         print("[Analogy] Warning: AI failed, using fallback message")
         return "I'm having trouble creating analogies right now. My AI circuits are a bit overloaded! Please try again in a moment. ⚡"
     return analogies.strip()
 
-async def get_analogies(question, learner_profile=None):
+async def get_analogies(question, learner_profile=None, history=None):
     """Main analogy generation function"""
     # Check for greeting tag or short query
     if "[GREETING]" in question or len(question.strip()) < 4:
-        return "Hello there! I am your Sparkle AI Analogy specialized agent. I'm here to translate core programming concepts into relatable real-life stories. What coding topic can I simplify for you today? ⚡"
+        return "Hello there! I am your Analogy Master specialized agent. I'm here to translate core programming concepts into relatable real-life stories. What coding topic can I simplify for you today? ⚡"
 
     print("\n" + "=" * 60)
     print(f"[Topic] Topic: {question}")
@@ -169,19 +226,20 @@ async def get_analogies(question, learner_profile=None):
         print("[Info] No relevant textbook content found")
         print("[Info] Will use general knowledge for analogies")
     
-    # Load Prompt Engineering Rules
-    print("\n[Search] Searching prompt engineering rules...")
-    try:
-        prompt_store = get_vector_store(PROMPT_DB_PATH, PROMPT_COLLECTION)
-        # We don't need to rerank the prompt rules, just do a normal search
-        prompt_rules, _ = await retrieve_relevant_context(prompt_store, question, top_k=PROMPT_TOP_K, use_reranker=False)
-    except Exception as e:
-        print(f"[Search] Could not load prompt rules: {e}")
-        prompt_rules = None
+    # Load Prompt Engineering Rules (Commented out to reduce delay)
+    # print("\n[Search] Searching prompt engineering rules...")
+    # try:
+    #     prompt_store = get_vector_store(PROMPT_DB_PATH, PROMPT_COLLECTION)
+    #     # We don't need to rerank the prompt rules, just do a normal search
+    #     prompt_rules, _ = await retrieve_relevant_context(prompt_store, question, top_k=PROMPT_TOP_K, use_reranker=False)
+    # except Exception as e:
+    #     print(f"[Search] Could not load prompt rules: {e}")
+    #     prompt_rules = None
+    prompt_rules = None
 
     # Generate analogies
     print("\n[AI] Creating relatable analogies...\n")
-    analogies = await generate_analogies(question, context, learner_profile, prompt_rules)
+    analogies = await generate_analogies(question, context, learner_profile, prompt_rules, history)
     
     print("=" * 60)
     print("[Knowledge] ANALOGIES:")

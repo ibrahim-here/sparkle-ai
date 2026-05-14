@@ -25,13 +25,13 @@ SURVEY RESPONSES:
 {formatted_responses}
 
 TASK:
-1. Determine the student's learning style breakdown (reading/writing, kinesthetic/hands-on, mixed).
+1. Determine the student's learning style breakdown using these exact names: In-Depth Explainer, Visualizer Agent, and Analogy Master.
 2. Identify if they are primarily one style or a hybrid learner.
 3. Provide a comprehensive summary (between 100 and 150 words) describing their learning personality.
 4. The summary should explain:
-   - Their primary learning style and percentage
+   - Their primary learning style and its name (In-Depth Explainer, Visualizer Agent, or Analogy Master)
    - Any significant secondary preferences 
-   - How Sparkle AI will adapt to their specific needs
+   - How Sparkle AI will adapt to their specific needs using their preferred agent
    - Specific teaching strategies that work best for them
 
 OUTPUT RULES:
@@ -41,14 +41,15 @@ OUTPUT RULES:
 - NO markdown, NO bullet points, NO extra formatting
 - JUST the summary string.
 
-Example: "You are primarily a reading-oriented learner with strong kinesthetic tendencies. You excel when concepts are explained through detailed written examples followed by hands-on practice. Sparkle AI will provide comprehensive text-based explanations with clear code examples, then offer interactive coding exercises to reinforce your understanding. You benefit from structured documentation and real-world problems that let you apply theory immediately. Your learning is most effective when you can read about a concept in depth, then experiment with it through practical implementation. Sparkle AI will balance detailed written breakdowns with opportunities for hands-on exploration and experimentation."
+Example: "You are primarily an In-Depth Explainer with strong tendencies toward the Visualizer Agent approach. You excel when concepts are explained through detailed written breakdowns followed by mental models and diagrams. Sparkle AI will provide comprehensive semantic analysis with clear code examples, then offer interactive visual structures to reinforce your understanding. You benefit from structured documentation and real-world problems that let you apply theory immediately. Your learning is most effective when you can analyze a concept in depth, then see it visualized through interactive nodes and flows. Sparkle AI will balance detailed technical explanations with opportunities for visual exploration."
 """
 
     try:
-        # Fetch the specific key for the profile agent from .env
-        profile_key = os.getenv("profile_agent")
+        # Fetch the specific key for the profile agent from .env with fallback
+        profile_key = os.getenv("profile_agent") or os.getenv("PROFILE_AGENT_BACKUP")
         
         # Generate summary using Gemini/OpenRouter with the specific key
+        # ai_utils.call_ai will handle retry if the key exists but fails
         text = call_ai(prompt, api_key=profile_key)
         if not text:
             print("[Profile] Warning: AI failed, using fallback summary")

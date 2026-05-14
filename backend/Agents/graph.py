@@ -16,14 +16,21 @@ class AgentState(TypedDict):
     manual_style: str
     enhanced_prompt: str
     selected_agent: str
-    intent: str  # New field: 'casual' or 'educational'
+    intent: str  # 'casual', 'educational', 'problem_solving', or 'out_of_scope'
     response: str
     history: List[dict]
+    is_followup: bool  # When True, skip classifier + validator entirely
 
 # 2. Define Nodes
 def classifier_node(state: AgentState):
     """Detect if the query is a routine greeting/casual chat, an educational theory question, or a coding/problem-solving request"""
     print("--- [GRAPH] CLASSIFIER NODE ---")
+
+    # ✅ Bypass: follow-up chip queries skip classification entirely
+    if state.get("is_followup"):
+        print("[GRAPH] is_followup=True — skipping classifier, routing as educational")
+        return {"intent": "educational"}
+
     prompt = f"""Analyze this user query for a programming tutor.
 Is it a casual greeting/social chat? Or is it an educational request?
 
@@ -53,6 +60,44 @@ def casual_node(state: AgentState):
     response = get_casual_response(state["query"], state["learner_summary"])
     return {"response": response}
 
+def validator_node(state: AgentState):
+    """Check if the educational/problem-solving query is within the scope of Programming Fundamentals"""
+    print("--- [GRAPH] VALIDATOR NODE ---")
+
+    # ✅ Bypass: follow-up chip queries are always in-scope (topic is from prior conversation)
+    if state.get("is_followup"):
+        print("[GRAPH] is_followup=True — skipping validator, passing through as in-scope")
+        return {"intent": state["intent"]}
+    
+    # List of allowed PF topics for reference
+    allowed_topics = [
+        "Variables", "Data Types", "Operators", "Control Structures", 
+        "Loops", "If-Else", "Arrays/Lists (1D, 2D)", "Functions/Methods", 
+        "Basic Structures/Objects (Structs)", "File Handling", "Programming Intro",
+        "Computer Architecture Basics", "Sorting (Bubble, Selection, etc.)", "CStrings"
+    ]
+    
+    prompt = f"""You are a strict Gatekeeper for a Programming Fundamentals (PF) tutor.
+Analyze the user query: "{state['query']}"
+
+Your only job is to decide if this query falls under basic Programming Fundamentals.
+Basic PF includes: {', '.join(allowed_topics)}.
+
+It EXCLUDES: Machine Learning (Linear Regression, etc.), AI, Advanced Data Science, Web Development frameworks, Advanced Algorithms (Dynamic Programming, Graph Theory), or complex System Design.
+
+If the query is within PF scope, answer ONLY with 'in_scope'.
+If it is NOT within PF scope, answer ONLY with 'out_of_scope'."""
+
+    response = call_ai(prompt)
+    
+    if response and 'out_of_scope' in response.lower():
+        return {
+            "intent": "out_of_scope",
+            "response": "My knowledge is focused on programming fundamental topics (loops, arrays, functions, etc.). I cannot assist with advanced algorithmic, specialized machine learning, or complex architectural topics at this time. ⚡"
+        }
+    
+    return {"intent": state["intent"]} # Maintain original intent
+
 def planner_node(state: AgentState):
     """Enhance the user query based on their learning profile"""
     print("--- [GRAPH] PLANNER NODE ---")
@@ -69,7 +114,7 @@ async def explainer_node(state: AgentState):
     """Execute the In-Depth Explainer agent"""
     print("--- [GRAPH] EXPLAINER NODE ---")
     try:
-        response = await get_explanation(state["query"], state["learner_summary"])
+        response = await get_explanation(state["query"], state["learner_summary"], state.get("history", []))
         return {"response": response}
     except Exception as e:
         print(f"[GRAPH] Explainer node crash: {e}")
@@ -79,7 +124,7 @@ async def analogy_node(state: AgentState):
     """Execute the Analogy agent"""
     print("--- [GRAPH] ANALOGY NODE ---")
     try:
-        response = await get_analogies(state["query"], state["learner_summary"])
+        response = await get_analogies(state["query"], state["learner_summary"], state.get("history", []))
         return {"response": response}
     except Exception as e:
         print(f"[GRAPH] Analogy node crash: {e}")
@@ -89,7 +134,7 @@ async def problem_solver_node(state: AgentState):
     """Execute the Problem Solver agent"""
     print("--- [GRAPH] PROBLEM SOLVER NODE ---")
     try:
-        response = await get_problem_solution(state["query"], state["learner_summary"])
+        response = await get_problem_solution(state["query"], state["learner_summary"], state.get("history", []))
         return {"response": response}
     except Exception as e:
         print(f"[GRAPH] Problem solver node crash: {e}")
@@ -101,7 +146,7 @@ workflow = StateGraph(AgentState)
 # Add Nodes
 workflow.add_node("classifier", classifier_node)
 workflow.add_node("casual", casual_node)
-workflow.add_node("planner", planner_node)
+workflow.add_node("validator", validator_node)
 workflow.add_node("router", router_node)
 workflow.add_node("explainer", explainer_node)
 workflow.add_node("analogy", analogy_node)
@@ -119,13 +164,27 @@ workflow.add_conditional_edges(
     route_intent,
     {
         "casual": "casual",
+        "educational": "validator",
+        "problem_solving": "validator"
+    }
+)
+
+# Add Conditional Edges for Validation
+def route_validation(state: AgentState):
+    return state["intent"]
+
+workflow.add_conditional_edges(
+    "validator",
+    route_validation,
+    {
+        "out_of_scope": END,
         "educational": "router",
         "problem_solving": "router"
     }
 )
 
 # Continue from Planner to Router
-workflow.add_edge("planner", "router")
+# workflow.add_edge("planner", "router")
 
 # Add Conditional Edges for Agent Selection
 def route_to_agent(state: AgentState):
@@ -154,7 +213,7 @@ workflow.add_edge("analogy", END)
 # Compile the Graph
 app = workflow.compile()
 
-async def run_sparkle_graph(query, learner_summary, learning_style, manual_style=None, history=[]):
+async def run_sparkle_graph(query, learner_summary, learning_style, manual_style=None, history=[], is_followup=False):
     """Async entry point to run the graph"""
     initial_state = {
         "query": query,
@@ -162,6 +221,7 @@ async def run_sparkle_graph(query, learner_summary, learning_style, manual_style
         "learning_style": learning_style,
         "manual_style": manual_style,
         "history": history,
+        "is_followup": is_followup,
         "intent": "",
         "enhanced_prompt": "",
         "selected_agent": "",

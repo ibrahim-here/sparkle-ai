@@ -1,7 +1,8 @@
 import os
 import sys
 import json
-from utils.ai_utils import call_ai
+from utils.ai_utils import call_groq
+# from utils.ai_utils import call_ai
 
 def get_casual_response(query, learner_profile=None):
     """
@@ -23,7 +24,9 @@ The user is engaging in casual chat or a greeting.
 
 Provide your formatted response now:"""
 
-    response = call_ai(prompt, temperature=0.5)
+    primary_key = os.getenv("grok_api_casual")
+    response = call_groq(prompt, temperature=0.1, primary_key=primary_key)
+    # response = call_ai(prompt, temperature=0.5)
     if not response:
         return "Hello! I'm Sparkle AI. How can I help you with your C++ learning today?"
     

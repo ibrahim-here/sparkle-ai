@@ -3,6 +3,7 @@ import api from './axios';
 export interface ChatMessage {
     role: 'user' | 'assistant';
     content: string;
+    intent?: string;
     timestamp?: string;
 }
 
@@ -20,13 +21,14 @@ export interface ChatQueryResponse {
         query: string;
         enhancedPrompt: string;
         agent: string;
+        intent: string;
         response: string;
     };
 }
 
 export const chatAPI = {
-    sendQuery: async (query: string, sessionId?: string, signal?: AbortSignal, manualStyle?: string): Promise<ChatQueryResponse> => {
-        const response = await api.post('/api/chat/query', { query, sessionId, manualStyle }, { signal });
+    sendQuery: async (query: string, sessionId?: string, signal?: AbortSignal, manualStyle?: string, isFollowup?: boolean): Promise<ChatQueryResponse> => {
+        const response = await api.post('/api/chat/query', { query, sessionId, manualStyle, isFollowup: isFollowup ?? false }, { signal });
         return response.data;
     },
 

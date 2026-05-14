@@ -72,7 +72,9 @@ def get_notebook_response(session_id, query):
 Provide your strict answer now:"""
 
     # Use the specific API key for notebook/upload operations
-    notebook_api_key = os.getenv("upload_book_or_pdf")
+    # Now includes fallback directly in the os.getenv call for availability,
+    # and call_ai handles retries if the key fails during the request.
+    notebook_api_key = os.getenv("upload_book_or_pdf") or os.getenv("UPLOAD_BOOK_OR_PDF_BACKUP")
     response_text = call_ai(prompt, temperature=0.1, api_key=notebook_api_key) # Low temp for strictness
     
     if not response_text:

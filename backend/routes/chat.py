@@ -20,6 +20,7 @@ class ChatQuery(BaseModel):
     query: str
     sessionId: Optional[str] = None
     manualStyle: Optional[str] = None
+    isFollowup: bool = False  # When True, bypasses classifier + validator
 
 # run_agent_script is now redundant as we use the LangGraph app directly
 
@@ -44,14 +45,40 @@ async def handle_query(chat_query: ChatQuery, current_user: dict = Depends(get_c
         # Priority: Use specifically requested style from UI, or fall back to user's database preference
         active_manual_style = chat_query.manualStyle or current_user.get("manualLearningStyle")
         
-        # Note: If history is needed, fetch previous messages here
+        # Fetch history
+        history_context = []
+        if session_id:
+            session = await db.chat_sessions.find_one({"_id": session_id, "userId": current_user["_id"]})
+            if session and "messages" in session:
+                recent_messages = session["messages"][-4:] # Last 4 messages
+                for msg in recent_messages:
+                    if msg["role"] == "user":
+                        history_context.append({"role": "user", "content": msg["content"]})
+                    elif msg["role"] == "assistant":
+                        truncated = msg["content"][:100] + "... [Response truncated for brevity]"
+                        history_context.append({"role": "assistant", "content": truncated})
+
+        print(f"[History] Fetched {len(history_context)} messages from session.")
+
+        # Build effective query — when follow-up chip is used, bake in the
+        # last discussed topic so RAG retrieval and the agent both know the topic.
+        effective_query = chat_query.query
+        if chat_query.isFollowup and history_context:
+            last_user_msgs = [m["content"] for m in history_context if m["role"] == "user"]
+            if last_user_msgs:
+                last_topic = last_user_msgs[-1]  # Most recent user query = the topic
+                effective_query = f"{chat_query.query} [Topic being discussed: {last_topic}]"
+                print(f"[History] Enriched follow-up query: {effective_query}")
+
         graph_result = await run_sparkle_graph(
-            query=chat_query.query,
+            query=effective_query,
             learner_summary=learner_summary,
             learning_style=learning_style,
-            manual_style=active_manual_style
+            manual_style=active_manual_style,
+            history=history_context,
+            is_followup=chat_query.isFollowup
         )
-        
+
         enhanced_prompt = graph_result["enhanced_prompt"]
         selected_agent = graph_result["selected_agent"]
         response_text = graph_result["response"]
@@ -61,9 +88,11 @@ async def handle_query(chat_query: ChatQuery, current_user: dict = Depends(get_c
         print(f"🤖 RESPONSE GENERATED")
         print("="*50 + "\n")
 
+        intent = graph_result.get("intent", "educational")
+
         # Persistence Logic
         user_msg = ChatMessage(role="user", content=chat_query.query)
-        assistant_msg = ChatMessage(role="assistant", content=response_text)
+        assistant_msg = ChatMessage(role="assistant", content=response_text, intent=intent)
 
         if not session_id:
             # Create a new session automatically if not provided
@@ -92,6 +121,7 @@ async def handle_query(chat_query: ChatQuery, current_user: dict = Depends(get_c
                 "query": chat_query.query,
                 "enhancedPrompt": enhanced_prompt,
                 "agent": selected_agent,
+                "intent": intent,
                 "response": response_text
             }
         }

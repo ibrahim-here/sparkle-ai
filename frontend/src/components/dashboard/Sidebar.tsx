@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useEffect, useState } from 'react';
 import { chatAPI, type ChatSession } from '../../api/chat.api';
+import ConfirmationModal from '../ui/ConfirmationModal';
+import { Trash2, LogOut, Settings, Plus, BookOpen, Sparkles, X } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -16,6 +18,19 @@ const Sidebar = ({ isOpen, onToggle, currentSessionId, onSessionSelect, sessionU
   const navigate = useNavigate();
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [loading, setLoading] = useState(false);
+  const [modalConfig, setModalConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    variant: 'danger' | 'primary';
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => { },
+    variant: 'primary'
+  });
 
   useEffect(() => {
     const fetchSessions = async () => {
@@ -39,19 +54,35 @@ const Sidebar = ({ isOpen, onToggle, currentSessionId, onSessionSelect, sessionU
     onSessionSelect(null);
   };
 
-  const handleDeleteSession = async (e: React.MouseEvent, id: string) => {
+  const handleDeleteSession = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    if (confirm('Delete this chat?')) {
-      try {
-        await chatAPI.deleteSession(id);
-        setSessions(prev => prev.filter(s => s.id !== id));
-        if (currentSessionId === id) {
-          onSessionSelect(null);
+    setModalConfig({
+      isOpen: true,
+      title: 'Delete Chat?',
+      message: 'This transmission and all its data will be permanently purged from the Sparkle network. This action cannot be undone.',
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await chatAPI.deleteSession(id);
+          setSessions(prev => prev.filter(s => s.id !== id));
+          if (currentSessionId === id) {
+            onSessionSelect(null);
+          }
+        } catch (err) {
+          console.error('Failed to delete session:', err);
         }
-      } catch (err) {
-        console.error('Failed to delete session:', err);
       }
-    }
+    });
+  };
+
+  const handleLogoutClick = () => {
+    setModalConfig({
+      isOpen: true,
+      title: 'Sign Out?',
+      message: 'Are you sure you want to terminate your current session? You will need to re-authenticate to access the network.',
+      variant: 'danger',
+      onConfirm: () => logout()
+    });
   };
 
   return (
@@ -72,16 +103,14 @@ const Sidebar = ({ isOpen, onToggle, currentSessionId, onSessionSelect, sessionU
         {/* Header */}
         <div className="p-6 border-b border-white/5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-2xl text-primary animate-pulse">✨</span>
+            <Sparkles className="text-primary animate-pulse" size={24} />
             <span className="font-black text-xl tracking-tighter uppercase">Sparkle <span className="text-primary">AI</span></span>
           </div>
           <button
             onClick={onToggle}
             className="lg:hidden p-2 hover:bg-white/5 rounded-xl transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X size={20} />
           </button>
         </div>
 
@@ -92,16 +121,16 @@ const Sidebar = ({ isOpen, onToggle, currentSessionId, onSessionSelect, sessionU
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all group ${currentSessionId === null ? 'bg-primary text-secondary shadow-glow-primary font-bold' : 'hover:bg-white/5 text-white/70'
               }`}
           >
-            <span className="text-xl">✏️</span>
-            <span className="font-medium">New chat</span>
+            <Plus size={20} />
+            <span className="font-medium text-sm">New chat</span>
           </button>
 
           <button
             onClick={() => navigate('/notebook')}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all group hover:bg-white/5 text-white/70 hover:text-blue-400"
           >
-            <span className="text-xl">📘</span>
-            <span className="font-medium">Notebook Mode</span>
+            <BookOpen size={20} />
+            <span className="font-medium text-sm">Notebook Mode</span>
           </button>
         </div>
 
@@ -127,12 +156,12 @@ const Sidebar = ({ isOpen, onToggle, currentSessionId, onSessionSelect, sessionU
                   : 'hover:bg-white/5 text-white/50 hover:text-white'
                   }`}
               >
-                <span className="text-sm truncate flex-1 text-left">{session.title}</span>
+                <span className="text-sm truncate flex-1 text-left font-medium">{session.title}</span>
                 <span
                   onClick={(e) => handleDeleteSession(e, session.id)}
-                  className="opacity-0 group-hover:opacity-100 hover:text-red-400 transition-opacity p-1"
+                  className="opacity-0 group-hover:opacity-100 hover:text-red-400 transition-all p-1.5 hover:bg-red-500/10 rounded-lg"
                 >
-                  🗑️
+                  <Trash2 size={14} />
                 </span>
               </button>
             ))
@@ -155,17 +184,29 @@ const Sidebar = ({ isOpen, onToggle, currentSessionId, onSessionSelect, sessionU
             onClick={() => navigate('/profile')}
             className="w-full px-4 py-2.5 hover:bg-white/5 border border-white/5 rounded-xl transition-all text-xs font-bold text-white/70 hover:text-white flex items-center justify-center gap-2 uppercase tracking-widest"
           >
-            <span>⚙️</span> Settings
+            <Settings size={14} /> Settings
           </button>
 
           <button
-            onClick={logout}
-            className="w-full px-4 py-2.5 bg-white/5 hover:bg-red-500/10 rounded-xl transition-all text-xs font-bold text-red-400 hover:text-red-300 uppercase tracking-widest"
+            onClick={handleLogoutClick}
+            className="w-full px-4 py-2.5 bg-white/5 hover:bg-red-500/10 rounded-xl transition-all text-xs font-bold text-red-400 hover:text-red-300 uppercase tracking-widest flex items-center justify-center gap-2"
           >
-            Sign out
+            <LogOut size={14} /> Sign out
           </button>
         </div>
+
       </aside>
+
+      {/* Global Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={modalConfig.isOpen}
+        onClose={() => setModalConfig(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={modalConfig.onConfirm}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        variant={modalConfig.variant}
+        confirmText={modalConfig.title.split(' ')[0]}
+      />
     </>
   );
 };

@@ -58,14 +58,14 @@ export const Navigation = ({ onCTAClick, onSignInClick }: NavigationProps) => {
               </button>
             ))}
 
-            {!isLandingPage && (
-              <Link
-                to="/dashboard"
-                className="text-white/60 hover:text-primary transition-all duration-300 font-medium text-sm tracking-wide uppercase"
-              >
-                Chat Terminal
-              </Link>
-            )}
+              <>
+                <Link
+                  to="/dashboard"
+                  className="text-white/60 hover:text-primary transition-all duration-300 font-medium text-sm tracking-wide uppercase"
+                >
+                  Chat Terminal
+                </Link>
+              </>
 
             <div className="h-4 w-[1px] bg-white/10" />
 

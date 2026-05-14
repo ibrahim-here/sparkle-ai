@@ -21,7 +21,7 @@ const DashboardLayout = (_props: DashboardLayoutProps) => {
 
   const handleSessionChange = (id: string | null) => {
     setCurrentSessionId(id);
-    setSidebarOpen(false); // Close sidebar on mobile when switching
+    setSidebarOpen(false);
   };
 
   const notifyUpdate = () => setSessionUpdated(prev => prev + 1);

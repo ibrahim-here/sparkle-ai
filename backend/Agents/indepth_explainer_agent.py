@@ -2,7 +2,8 @@ import os
 import sys
 import json
 import asyncio
-from utils.ai_utils import call_ai, get_vector_store, get_reranker_model
+from utils.ai_utils import call_groq, get_vector_store, get_reranker_model
+# from utils.ai_utils import call_ai, get_vector_store, get_reranker_model
 
 # Configuration
 CHROMA_DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "chroma_db_semantic")
@@ -85,7 +86,7 @@ async def retrieve_relevant_context(vector_store, query, top_k=TOP_K_RESULTS, us
     
     return combined_context, contexts
 
-async def generate_indepth_explanation(query, context, learner_profile=None, prompt_rules=None):
+async def generate_indepth_explanation(query, context, learner_profile=None, prompt_rules=None, history=None):
     """Generate comprehensive, in-depth explanation using retrieved context + LLM's knowledge"""
     
     # Build profile context string if provided
@@ -100,6 +101,14 @@ async def generate_indepth_explanation(query, context, learner_profile=None, pro
 Use this profile to tailor your explanation. If the student has secondary preferences (e.g., 30% kinesthetic alongside reading), incorporate those elements (e.g., add hands-on code examples).- If they ask who you are, explain you are an AI tutor personalized to their learning style.
 """
 
+    history_context = ""
+    if history and len(history) > 0:
+        history_context = "\n[Conversation History - For Context]:\n"
+        for msg in history:
+            role = "USER" if msg["role"] == "user" else "AI"
+            history_context += f"{role}: {msg['content']}\n"
+        history_context += "\nCRITICAL: Use the above context to understand what topic the user is asking about. If they ask for 'more examples' or 'a quiz', refer to the most recently discussed topic.\n"
+
     prompt_engineering_context = ""
     if prompt_rules:
         prompt_engineering_context = f"""
@@ -107,7 +116,7 @@ Use this profile to tailor your explanation. If the student has secondary prefer
 {prompt_rules}
 """
 
-    prompt = f"""You are an expert Programming Instructor specialized in **Programming Fundamentals**. Your goal is to provide clear, focused explanations of core concepts in any programming language (e.g., C++, Python, Java).{profile_context}{prompt_engineering_context}
+    prompt = f"""You are the **In-Depth Explainer** agent of Sparkle AI, an expert Programming Instructor specialized in **Programming Fundamentals**. Your goal is to make students genuinely excited about understanding core concepts — not just memorizing them.{profile_context}{prompt_engineering_context}{history_context}
 
 [Knowledge] TEXTBOOK CONTENT (C++ SPECIFIC):
 {context if context else "No direct matches found. Use your general knowledge for the requested language."}
@@ -120,33 +129,65 @@ Use this profile to tailor your explanation. If the student has secondary prefer
 2. **Advanced Topic Rejection**: If the user asks about advanced topics like Dynamic Programming, Graph Theory, AI/ML, or complex system design, you MUST respond exactly with: "My knowledge is focused on programming fundamental topics (loops, arrays, functions, etc.). I cannot assist with advanced algorithmic or specialized architectural topics at this time."
 3. **Multi-Language Support**: Provide the explanation in the programming language requested by the user. If they don't specify, use C++. If the textbook context above is C++ and they asked for Python, use the C++ textbook concepts as a logic guide but explain the Python implementation.
 
-🎯 YOUR TASK:
-Provide a comprehensive explanation (300-500 words) that covers:
-1. **What it is**: Clear definition in 1-2 sentences.
-2. **How it works**: Key concepts and syntax in the requested language.
-3. **Code Example**: 1-2 practical examples with brief explanations.
-4. **Key Points**: A list of important things to remember.
+🎯 YOUR TASK — Build a complete LEARNING JOURNEY (500-750 words):
 
-📝 FORMATTING GUIDELINES:
-- Use proper Markdown headings (`#`, `##`, `###`).
-- **Visual Style**: Use relevant emojis (💡, 🚀, ⚙️, 📝).
-- **Callouts**: Use blockquotes (`>`) for "Pro-Tips" or "Key Takeaways".
+## 🎯 The Hook
+Start with a compelling WHY — a real problem this concept solves in 2-3 sentences. Make the student think "oh, that's why this exists." Do NOT start with a dictionary definition.
+
+## 🧠 The Mental Model
+Give one clear, memorable mental picture in 2-3 sentences. Something the student can hold in their head. Make it specific and vivid — not "it's like a box", but a real concrete image.
+
+## ⚙️ How It Works — Step by Step
+Walk through the mechanics with numbered steps. Bold key terms the first time they appear. Where relevant, describe what's happening in memory or at runtime. Keep each step short and punchy.
+
+## 💻 Code in Action
+Provide EXACTLY 2 code examples that build on each other:
+
+**Example 1 — Minimal:** The simplest possible working version (3-6 lines max). Every line must have a comment.
+
+**Example 2 — Practical:** A slightly more realistic usage that adds ONE new idea on top of Example 1. Comments explain the new concept.
+
+After each example, add a brief "🔍 What's happening:" annotation (2-3 bullet points) tracing the execution.
+
+## ⚠️ Common Traps
+Show a comparison table of 2-3 mistakes beginners make:
+
+| ❌ Wrong | ✅ Right | Why |
+|----------|---------|-----|
+| wrong code | fixed code | short reason |
+
+## 🔗 Connection Map
+One sentence: what concept does this build ON? One sentence: what concept does this UNLOCK next?
+
+## 💡 Key Takeaways
+3-4 bullet points — each a memorable "rule of thumb", NOT definitions restated.
+
+📝 ABSOLUTE FORMATTING RULES:
+- Use Markdown headings (##, ###) — do NOT skip heading levels.
+- ALL code must be in fenced code blocks with language tag: \`\`\`cpp ... \`\`\`
+- Use tables for comparisons (Common Traps section is a table).
+- Use blockquotes (>) for pro-tips and aha moments.
+- Use **bold** for first-time technical term introductions.
+- Use relevant emojis as section starters (NOT randomly scattered in text).
 - End with: "Keep sparkling! ⚡ — Sparkle AI Team"
 
-Provide your brilliant, formatted explanation now:"""
+Provide your complete, formatted learning journey now:"""
     
-    # Generate explanation using OpenRouter/Gemini natively threaded
-    explanation = await asyncio.to_thread(call_ai, prompt)
+    # Generate explanation using Groq natively threaded instead of Gemini
+    primary_key = os.getenv("grok_api_in_Depth")
+    backup_key = os.getenv("grok_api_analogy_indepth")
+    explanation = await asyncio.to_thread(call_groq, prompt, 0.3, primary_key, backup_key)
+    # explanation = await asyncio.to_thread(call_ai, prompt)
     if not explanation:
         print("[Explainer] Warning: AI failed, using fallback message")
         return "I'm having trouble generating a detailed explanation right now due to high demand. Please try again in 1-2 minutes! ⚡"
     return explanation.strip()
 
-async def get_explanation(question, learner_profile=None):
+async def get_explanation(question, learner_profile=None, history=None):
     """Main in-depth explanation function"""
     # Check for greeting tag or short query
     if "[GREETING]" in question or len(question.strip()) < 4:
-        return "Hello! I am your Sparkle AI learning assistant. I see you're ready to dive into programming! Whenever you have a specific concept or problem you'd like me to explain in-depth, just let me know and I'll tailor the explanation to your learning style. ⚡"
+        return "Hello! I am your In-Depth Explainer agent. I see you're ready to dive into programming! Whenever you have a specific concept or problem you'd like me to explain in-depth, just let me know and I'll tailor the explanation to your learning style. ⚡"
 
     print("\n" + "=" * 70)
     print(f"[Topic] Topic for In-Depth Explanation: {question}")
@@ -168,19 +209,20 @@ async def get_explanation(question, learner_profile=None):
         print("[Info] No relevant textbook content found")
         print("[Info] Will use general knowledge for explanation")
     
-    # Load Prompt Engineering Rules
-    print("\n[Search] Searching prompt engineering rules...")
-    try:
-        prompt_store = get_vector_store(PROMPT_DB_PATH, PROMPT_COLLECTION)
-        # We don't need to rerank the prompt rules, just do a normal search
-        prompt_rules, _ = await retrieve_relevant_context(prompt_store, question, top_k=PROMPT_TOP_K, use_reranker=False)
-    except Exception as e:
-        print(f"[Search] Could not load prompt rules: {e}")
-        prompt_rules = None
+    # Load Prompt Engineering Rules (Commented out to reduce delay)
+    # print("\n[Search] Searching prompt engineering rules...")
+    # try:
+    #     prompt_store = get_vector_store(PROMPT_DB_PATH, PROMPT_COLLECTION)
+    #     # We don't need to rerank the prompt rules, just do a normal search
+    #     prompt_rules, _ = await retrieve_relevant_context(prompt_store, question, top_k=PROMPT_TOP_K, use_reranker=False)
+    # except Exception as e:
+    #     print(f"[Search] Could not load prompt rules: {e}")
+    #     prompt_rules = None
+    prompt_rules = None
 
     # Generate in-depth explanation
     print("\n[AI] Generating comprehensive, in-depth explanation...\n")
-    explanation = await generate_indepth_explanation(question, context, learner_profile, prompt_rules)
+    explanation = await generate_indepth_explanation(question, context, learner_profile, prompt_rules, history)
     
     print("=" * 70)
     print("[Knowledge] IN-DEPTH EXPLANATION:")

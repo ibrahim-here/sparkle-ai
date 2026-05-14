@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Upload, FileText, Loader2, BookOpen, Trash2, ArrowLeft } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import ConfirmationModal from '../components/ui/ConfirmationModal';
 
 // --- API Client ---
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -129,6 +130,7 @@ const NotebookPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [isLoadingSessions, setIsLoadingSessions] = useState(false);
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -346,7 +348,7 @@ const NotebookPage = () => {
                     </label>
 
                     <button
-                        onClick={handleNewSession}
+                        onClick={() => setIsConfirmModalOpen(true)}
                         className="flex items-center justify-center gap-2 w-full py-3 bg-white/[0.03] hover:bg-white/[0.05] border border-white/10 text-white/70 rounded-xl transition-all text-xs font-bold uppercase tracking-widest"
                     >
                         <Trash2 className="w-4 h-4" />
@@ -425,6 +427,17 @@ const NotebookPage = () => {
                     </p>
                 </div>
             </div>
+
+            {/* Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={isConfirmModalOpen}
+                onClose={() => setIsConfirmModalOpen(false)}
+                onConfirm={handleNewSession}
+                title="Clear Context?"
+                message="This will wipe the current neural context and all uploaded sources from this session. You will need to re-upload files to continue research."
+                variant="danger"
+                confirmText="Clear"
+            />
         </div>
     );
 };

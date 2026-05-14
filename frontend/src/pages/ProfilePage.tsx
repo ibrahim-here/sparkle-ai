@@ -94,16 +94,20 @@ const ProfilePage = () => {
                                 <div className="mt-10">
                                     <h4 className="font-bold mb-6 text-white/90 tracking-tight text-lg">Cognitive Breakdown</h4>
                                     <div className="space-y-6">
-                                        {['visual', 'reading', 'kinesthetic'].map((style) => (
-                                            <div key={style} className="space-y-3">
+                                        {[
+                                            { id: 'reading', name: 'In-Depth Explainer' },
+                                            { id: 'visual', name: 'Visualizer Agent' },
+                                            { id: 'kinesthetic', name: 'Analogy Master' }
+                                        ].map((style) => (
+                                            <div key={style.id} className="space-y-3">
                                                 <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
-                                                    <span className="text-white/40">{style}</span>
-                                                    <span className="text-primary">{user?.learningStyle?.[style as keyof typeof user.learningStyle] || 0}%</span>
+                                                    <span className="text-white/40">{style.name}</span>
+                                                    <span className="text-primary">{user?.learningStyle?.[style.id as keyof typeof user.learningStyle] || 0}%</span>
                                                 </div>
                                                 <div className="h-2 bg-white/5 rounded-full overflow-hidden">
                                                     <div
                                                         className="h-full bg-primary shadow-glow-primary transition-all duration-1000"
-                                                        style={{ width: `${user?.learningStyle?.[style as keyof typeof user.learningStyle] || 0}%` }}
+                                                        style={{ width: `${user?.learningStyle?.[style.id as keyof typeof user.learningStyle] || 0}%` }}
                                                     />
                                                 </div>
                                             </div>
@@ -131,9 +135,9 @@ const ProfilePage = () => {
                                             className="w-full p-4 rounded-2xl border border-white/10 bg-white/[0.03] text-white focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer"
                                         >
                                             <option value="none" className="bg-secondary">System Recommendation (Standard)</option>
-                                            <option value="visual" className="bg-secondary">Visual Synthesis (Nodes & Flow)</option>
-                                            <option value="reading" className="bg-secondary">Semantic Analysis (Docs & Code)</option>
-                                            <option value="kinesthetic" className="bg-secondary">Kinesthetic Execution (Interactions)</option>
+                                            <option value="reading" className="bg-secondary">In-Depth Explainer (Semantic Analysis)</option>
+                                            <option value="visual" className="bg-secondary">Visualizer Agent (Nodes & Flow)</option>
+                                            <option value="kinesthetic" className="bg-secondary">Analogy Master (Kinesthetic Execution)</option>
                                             <option value="mixed" className="bg-secondary">Hybrid Multi-Modal</option>
                                         </select>
                                     </div>

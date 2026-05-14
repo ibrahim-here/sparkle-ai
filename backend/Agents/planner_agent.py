@@ -46,15 +46,15 @@ def enhance_prompt(raw_query, learner_profile_summary=None):
     3. Calls the LLM to generate the final, enhanced query
     """
 
-    # 1. Retrieve Context
+    # 1. Retrieve Context (Commented out to reduce delay)
     context = None
-    try:
-        vector_store = get_vector_store(CHROMA_DB_PATH, COLLECTION_NAME)
-        context_str, contexts = retrieve_relevant_context(vector_store, raw_query)
-        context = context_str
-    except Exception as e:
-        print(f"Error retrieving context: {e}")
-        pass
+    # try:
+    #     vector_store = get_vector_store(CHROMA_DB_PATH, COLLECTION_NAME)
+    #     context_str, contexts = retrieve_relevant_context(vector_store, raw_query)
+    #     context = context_str
+    # except Exception as e:
+    #     print(f"Error retrieving context: {e}")
+    #     pass
 
     # 2. Build Profile Instruction
     profile_instruction = ""
