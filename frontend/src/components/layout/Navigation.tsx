@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, LogOut, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../ui/Button';
@@ -9,7 +9,7 @@ import { useAuth } from '../../context/AuthContext';
 
 interface NavigationProps {
   onCTAClick: () => void;
-  onSignInClick: () => void;
+  onSignInClick: () => void; // kept for backward compat
 }
 
 export const Navigation = ({ onCTAClick, onSignInClick }: NavigationProps) => {
@@ -58,16 +58,8 @@ export const Navigation = ({ onCTAClick, onSignInClick }: NavigationProps) => {
               </button>
             ))}
 
-              <>
-                <Link
-                  to="/dashboard"
-                  className="text-white/60 hover:text-primary transition-all duration-300 font-medium text-sm tracking-wide uppercase"
-                >
-                  Chat Terminal
-                </Link>
-              </>
+            {navLinks.length > 0 && <div className="h-4 w-[1px] bg-white/10" />}
 
-            <div className="h-4 w-[1px] bg-white/10" />
 
             {user ? (
               <div className="relative">
@@ -109,7 +101,7 @@ export const Navigation = ({ onCTAClick, onSignInClick }: NavigationProps) => {
                         className="w-full px-4 py-3 text-left hover:bg-white/5 rounded-xl flex items-center gap-3 text-white/70 transition-colors"
                       >
                         <User size={16} />
-                        Neural Profile
+                        Profile
                       </button>
                       <button
                         onClick={() => {
@@ -169,15 +161,6 @@ export const Navigation = ({ onCTAClick, onSignInClick }: NavigationProps) => {
                 </button>
               ))}
               <div className="h-[1px] w-full bg-white/5" />
-              <button
-                onClick={() => {
-                  onSignInClick();
-                  setIsMobileMenuOpen(false);
-                }}
-                className="block w-full text-left text-white/60 hover:text-white transition-colors font-medium text-lg py-2"
-              >
-                Sign In
-              </button>
               <Button onClick={onCTAClick} className="w-full bg-primary text-secondary font-bold py-4 rounded-xl shadow-glow-primary">
                 Get Started
               </Button>

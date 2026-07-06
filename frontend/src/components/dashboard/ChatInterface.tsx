@@ -21,7 +21,7 @@ const AGENT_META: Record<string, { icon: string; label: string; color: string; t
 const FOLLOWUP_CHIPS = [
     { id: 'simpler', label: '🔄 Simpler please', prompt: 'Explain that more simply, like I\'m a complete beginner' },
     { id: 'examples', label: '💻 More examples', prompt: 'Give me 2-3 more practical code examples with explanations' },
-    { id: 'quiz', label: '🧪 Quiz me', prompt: 'Quiz me on what I just learned with 3 questions' },
+    { id: 'quiz', label: '🧪 Quiz me', prompt: 'Quiz me on what I just learned' },
     { id: 'analogy', label: '🎨 Try an analogy', prompt: 'Explain the same concept using a real-life analogy' },
 
 ];

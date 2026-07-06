@@ -18,16 +18,7 @@ export const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
       <div className="scanline" />
 
       <div className="w-full max-w-6xl mx-auto px-6 flex flex-col items-center relative z-10">
-        {/* Badge */}
-        <motion.div
-          className="inline-flex items-center gap-3 px-3 py-1.5 rounded-full glass border border-white/10 mb-10"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-          <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/50">System Version 1.0.1 - Live</span>
-        </motion.div>
+
 
         {/* Main Heading */}
         <div className="text-center mb-8 relative">
@@ -41,16 +32,7 @@ export const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
             <span className="gradient-text">Personalization</span>
           </motion.h1>
 
-          <motion.div
-            className="absolute -right-12 top-0 hidden lg:block"
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 1, type: "spring" }}
-          >
-            <div className="glass-neon px-4 py-2 rounded-xl text-primary text-xs font-bold border border-primary/20 animate-float">
-              AI ADAPTIVE
-            </div>
-          </motion.div>
+
         </div>
 
         {/* Subheading */}
@@ -60,7 +42,7 @@ export const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
         >
-          Transcend traditional learning. Our agents decompose complex concepts into your specific mental models, instantly.
+          Master programming on your own terms. Specialized AI agents adapt complex concepts to your learning style, instantly.
         </motion.p>
 
         {/* CTA Buttons */}
@@ -79,10 +61,7 @@ export const HeroSection = ({ onGetStarted }: HeroSectionProps) => {
 
         </motion.div>
 
-        {/* Floating Decorative Elements */}
-        <div className="mt-20 flex gap-12 opacity-20 filter grayscale contrast-200">
-          {/* Add some minimalist geometric icons or numbers here if needed */}
-        </div>
+
       </div>
     </section>
   );

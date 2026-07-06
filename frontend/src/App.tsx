@@ -5,9 +5,9 @@ import { Navigation } from './components/layout/Navigation';
 import { HeroSection } from './components/sections/HeroSection';
 import { AgentsShowcase } from './components/sections/AgentsShowcase';
 import { FeaturesSection } from './components/sections/FeaturesSection';
-import { DemoSection } from './components/sections/DemoSection';
 import { FinalCTASection } from './components/sections/FinalCTASection';
 import { AuthModal } from './components/auth/AuthModal';
+import { Footer } from './components/layout/Footer';
 import OnboardingPage from './pages/OnboardingPage';
 import DashboardPage from './pages/DashboardPage';
 import ProfilePage from './pages/ProfilePage';
@@ -36,10 +36,10 @@ function LandingPage() {
         <HeroSection onGetStarted={handleGetStarted} />
         <AgentsShowcase />
         <FeaturesSection />
-        <DemoSection />
         <FinalCTASection onGetStarted={handleGetStarted} />
       </main>
 
+      <Footer />
 
       <AuthModal
         isOpen={authModalOpen}
