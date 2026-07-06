@@ -67,7 +67,7 @@ npm run dev
 
 1. Navigate to frontend directory:
 ```bash
-cd sparkle-landing
+cd frontend
 ```
 
 2. Install dependencies:
@@ -139,8 +139,14 @@ sparkle-ai/
 │   ├── middleware/         # Auth and validation middleware
 │   ├── models/             # Mongoose models
 │   ├── routes/             # API routes
-│   └── utils/              # Helper functions
-├── sparkle-landing/        # React frontend
+│   ├── utils/              # Helper functions
+│   ├── promptEngineering/  # Prompt engineering guides
+│   ├── Agents/             # AI agent implementations
+│   ├── chroma_db/          # Vector database storage
+│   ├── createembeddings.py # Utility to create embeddings from textbook data
+│   ├── create_prompt_embeddings.py # Utility to create prompt embeddings
+│   └── lesson_plan.json    # Lesson plan data
+├── frontend/               # React frontend
 │   ├── src/
 │   │   ├── api/           # API service layer
 │   │   ├── components/    # React components
@@ -159,8 +165,3 @@ MIT License - feel free to use this project for learning and development.
 
 Ibrahim - [GitHub](https://github.com/ibrahim-here)
 
-## 🙏 Acknowledgments
-
-- Built with Kiro AI assistance
-- Inspired by modern AI learning platforms
-- Design influenced by ChatGPT's clean interface

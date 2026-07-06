@@ -1,0 +1,353 @@
+{
+    "global_milestone_structure": [
+        {
+            "id": 1,
+            "type": "Motivation",
+            "label": "Why Use This?",
+            "goal": "Explain the real-world problem this concept solves."
+        },
+        {
+            "id": 2,
+            "type": "Analogy",
+            "label": "Concept Analogy",
+            "goal": "Use a familiar comparison to make the logic intuitive."
+        },
+        {
+            "id": 3,
+            "type": "Mechanical Step 1",
+            "label": "Getting Started",
+            "goal": "Show the very first step of the logic in action."
+        },
+        {
+            "id": 4,
+            "type": "Full Action",
+            "label": "Full Execution",
+            "goal": "Allow the user to see the entire logic run until completion."
+        },
+        {
+            "id": 5,
+            "type": "Conclusion",
+            "label": "Key Takeaways",
+            "goal": "Summary and final state verification."
+        }
+    ],
+    "computer_architecture": {
+        "description": "Visualize how a computer works internally — memory, CPU, and the fetch-decode-execute cycle",
+        "milestones": [
+            {
+                "id": 1,
+                "type": "Motivation",
+                "title": "Why Understand Architecture?",
+                "philosophy": "Show a laggy computer. Motivation: Every line of code uses hardware resources. Understanding architecture helps write efficient code."
+            },
+            {
+                "id": 2,
+                "type": "Analogy",
+                "title": "The Chef Analogy",
+                "philosophy": "CPU is the Chef, Memory (RAM) is the counter, Hard Drive is the pantry. Fetching from counter is fast; fetching from pantry is slow."
+            },
+            {
+                "id": 3,
+                "type": "Mechanical Step 1",
+                "title": "Instruction Fetch",
+                "philosophy": "Show RAM with instructions and CPU with an IR register. Animate a value moving from RAM to IR via the 'move' action."
+            },
+            {
+                "id": 4,
+                "type": "Full Action",
+                "title": "Fetch-Decode-Execute Cycle",
+                "philosophy": "Show a simple loop (Fetch -> Decode -> Execute). Provide a 'Next Cycle' button. Animate data moving through registers (PC, IR, ACC)."
+            },
+            {
+                "id": 5,
+                "type": "Conclusion",
+                "title": "System State",
+                "philosophy": "Show the final state of registers and memory after a small program finishes. Summary of the internal data flow."
+            }
+        ],
+        "non_negotiables": [
+            "PC must increment on every fetch",
+            "Memory cells must have explicit addresses (e.g., 0x00, 0x01)",
+            "Use 'highlight' on the active register/memory cell"
+        ]
+    },
+    "loops": {
+        "description": "Visualize iterative execution with state tracking",
+        "milestones": [
+            {
+                "id": 1,
+                "type": "Motivation",
+                "title": "Why Loops?",
+                "philosophy": "Show a program needing to do 100 similar tasks (e.g., printing 100 lines). Show that writing it line-by-line is painful. Motivation: Efficiency and reuse."
+            },
+            {
+                "id": 2,
+                "type": "Analogy",
+                "title": "The Treadmill Analogy",
+                "philosophy": "Show a treadmill or a lap track. A runner goes in a circle. Each lap, a counter increments. This makes the concept of 'iteration' intuitive before showing code."
+            },
+            {
+                "id": 3,
+                "type": "Mechanical Step 1",
+                "title": "The First Iteration",
+                "philosophy": "Show the `for` loop initialization and the very first check. Highlight the jump into the loop body. Show the counter `i` becoming 0."
+            },
+            {
+                "id": 4,
+                "type": "Full Action",
+                "title": "Loop to Completion",
+                "philosophy": "Show a countdown or an array processing. Provide a 'Run All' button that iterates through the entire loop until the condition is false. Animate the final exit."
+            },
+            {
+                "id": 5,
+                "type": "Conclusion",
+                "title": "Summary of Loops",
+                "philosophy": "A final state screen where the task is complete (e.g. all array elements processed). Compare the start vs end state. Flowchart: Final state showing the path taken and the end node."
+            }
+        ],
+        "non_negotiables": [
+            "No shape/text goes outside the canvas boundary",
+            "Color palette: #1E1E2E (bg), #89B4FA (primary), #A6E3A1 (success), #F38BA8 (error/stop), #CDD6F4 (text)",
+            "Every diagram must have a visible text explanation panel below the canvas",
+            "Interactive elements must have hover states",
+            "Canvas size: fixed 700x400, responsive padding only"
+        ]
+    },
+    "control_structures": {
+        "description": "Visualize fundamental control flow mechanisms like conditionals and loops.",
+        "milestones": [
+            {
+                "id": 1,
+                "type": "Motivation",
+                "title": "Decision Making",
+                "philosophy": "Show a smooth program flow suddenly hitting a wall. Motivation: We need logic to handle different cases (e.g., Logged In vs Logged Out)."
+            },
+            {
+                "id": 2,
+                "type": "Analogy",
+                "title": "The Fork in the Road",
+                "philosophy": "Show a road that splits into two. One side has a 'True' sign, the other 'False'. Flowchart: An arrow entering a Diamond (Condition) with two exit arrows."
+            },
+            {
+                "id": 3,
+                "type": "Mechanical Step 1",
+                "title": "The Condition Check",
+                "philosophy": "Show a diamond box with a condition (e.g., x > 5). Highlight it in yellow while it's 'checking'. Animate the flow chose one path based on variable value."
+            },
+            {
+                "id": 4,
+                "type": "Full Action",
+                "title": "If-Else Execution",
+                "philosophy": "Provide a toggle for the variable value. Button: 'Start Flow'. Animate a colored dot (Program Counter) moving through the nodes and arrows to the correct block."
+            },
+            {
+                "id": 5,
+                "type": "Conclusion",
+                "title": "Path Summary",
+                "philosophy": "Final state showing which block was executed. Clear 'Result' message on canvas."
+            }
+        ],
+        "non_negotiables": [
+            "Use Arrows to connect nodes",
+            "Diamonds for if-conditions",
+            "Colors: #50FA7B for True path, #FF5555 for False path"
+        ]
+    },
+    "while_loops": {
+        "description": "Visualize repeated execution based on a continuous condition check.",
+        "milestones": [
+            {
+                "id": 1,
+                "type": "Motivation",
+                "title": "Handling Uncertainty",
+                "philosophy": "Sometimes we don't know how many times to repeat (e.g., wait until user types 'exit'). Motivation: Conditional termination."
+            },
+            {
+                "id": 2,
+                "type": "Analogy",
+                "title": "The Bouncer Analogy",
+                "philosophy": "Show a bouncer at a club door. 'Is the club full?'. If NO, one person enters. The bouncer checks AGAIN for the next person."
+            },
+            {
+                "id": 3,
+                "type": "Mechanical Step 1",
+                "title": "First Integration",
+                "philosophy": "Show a Diamond (Condition: count < 3). Show an Arrow to a block (Print 'Hello'). Button: 'Step One'. Animate the highlight moving from Diamond -> Block -> Back to Diamond."
+            },
+            {
+                "id": 4,
+                "type": "Full Action",
+                "title": "Program Flow & Output",
+                "philosophy": "Show the Flowchart (Diamond + Body Block + Loopback Arrow). Provide an 'Iterate' button. Every click: 1. Highlight Diamond. 2. Highlight Body. 3. Update 'Console' text at bottom showing 'Hello' repeated. 4. Change Node color to track 'Execution Pointer'."
+            },
+            {
+                "id": 5,
+                "type": "Conclusion",
+                "title": "Termination state",
+                "philosophy": "Show the condition becoming FALSE. Flow skips the body block and goes to FINISH node. Final console state shown."
+            }
+        ],
+        "non_negotiables": [
+            "Must show a 'Console' area for print statements",
+            "Body block must have a loopback arrow to the condition",
+            "Execution pointer (colored highlight) must be visible"
+        ]
+    },
+    "functions": {
+        "description": "Visualize function calls, stack, and parameter passing",
+        "milestones": [
+            {
+                "id": 1,
+                "type": "Motivation",
+                "title": "Why Functions?",
+                "philosophy": "Show 5 identical blocks of code scattered in a main() function. Motivation: Code reuse and modularity (DRY principle: Don't Repeat Yourself)."
+            },
+            {
+                "id": 2,
+                "type": "Analogy",
+                "title": "The Toolbox Analogy",
+                "philosophy": "Show a toolbox. Each tool (function) does one specific thing. You 'call' the tool when needed instead of rebuilding it."
+            },
+            {
+                "id": 3,
+                "type": "Mechanical Step 1",
+                "title": "Function Call",
+                "philosophy": "Show `main()` calling `add(a, b)`. Animate the execution jump from main to the function block."
+            },
+            {
+                "id": 4,
+                "type": "Full Action",
+                "title": "Parameter Passing & Return",
+                "philosophy": "Show values (arguments) flying into function parameters. Animate the calculation. Animate the 'return' value flying back to the caller."
+            },
+            {
+                "id": 5,
+                "type": "Conclusion",
+                "title": "Execution Summary",
+                "philosophy": "Show the stack level decreasing as function exits. Summarize the role of inputs and outputs."
+            }
+        ],
+        "non_negotiables": [
+            "Caller frame colored differently from Callee",
+            "Explicit 'Return' button to trigger data flow back"
+        ]
+    },
+    "variables": {
+        "description": "Visualize memory, assignment, and data types",
+        "milestones": [
+            {
+                "id": 1,
+                "type": "Motivation",
+                "title": "Why Variables?",
+                "philosophy": "Show a program needing to remember a player's score. Show that without a variable, the data is lost. Motivation: Persistence and memory."
+            },
+            {
+                "id": 2,
+                "type": "Analogy",
+                "title": "The Box Analogy",
+                "philosophy": "Show a labeled box. A value (e.g., '5') is put inside. Clicking the label shows the name, clicking inside shows the value. This makes 'variable name vs value' intuitive."
+            },
+            {
+                "id": 3,
+                "type": "Mechanical Step 1",
+                "title": "Declaration and Assignment",
+                "philosophy": "Show the code `int x = 10;`. Animate a new box being created in the 'Memory' area and labeled 'x'. Put '10' inside."
+            },
+            {
+                "id": 4,
+                "type": "Full Action",
+                "title": "Updating Variables",
+                "philosophy": "Show a clicker game logic. A variable `count` starts at 0. Button: 'Increment'. Animate the value inside the box updating each click. This shows variables as dynamic storage."
+            },
+            {
+                "id": 5,
+                "type": "Conclusion",
+                "title": "Final Memory State",
+                "philosophy": "Show a memory strip with several variables. Verify they all have unique names and current values. Final summary of variable role."
+            }
+        ],
+        "non_negotiables": [
+            "Variable labels must be distinct from values",
+            "Show memory address placeholders (e.g., Box #101)"
+        ]
+    },
+    "sorting": {
+        "description": "Visualize comparison-based sorting algorithms step by step",
+        "milestones": [
+            {
+                "id": 1,
+                "type": "Motivation",
+                "title": "Why Sort?",
+                "philosophy": "Show a library with books in random order. Show how long it takes to find 'Harry Potter'. Motivation: Fast searching (binary search requires sorted data)."
+            },
+            {
+                "id": 2,
+                "type": "Analogy",
+                "title": "The Height Lineup Analogy",
+                "philosophy": "Show a group of people of different heights. We want to arrange them from shortest to tallest. Compare adjacent people one by one."
+            },
+            {
+                "id": 3,
+                "type": "Mechanical Step 1",
+                "title": "The First Swap",
+                "philosophy": "Show an array of 6-8 boxes. Compare indices 0 and 1. If 0 > 1, swap them using the 'swap' action. Highlight the compared cells."
+            },
+            {
+                "id": 4,
+                "type": "Full Action",
+                "title": "Complete Sorting Pass",
+                "philosophy": "Provide a 'Step Algorithm' or 'Run Full Pass' button. Clicking it executes swaps until the largest element 'bubbles' to the end. User can repeat until fully sorted."
+            },
+            {
+                "id": 5,
+                "type": "Conclusion",
+                "title": "Sorted State",
+                "philosophy": "Show the entire array in green (#50FA7B). Final state verification: check if array is ascending. Success indicator."
+            }
+        ],
+        "non_negotiables": [
+            "Never show only 1 or 2 elements for sorting; use 6-8.",
+            "Use 'swap' action for all element exchanges.",
+            "Always highlight compared indices."
+        ]
+    },
+    "cstrings": {
+        "description": "Visualize null-terminated character arrays",
+        "milestones": [
+            {
+                "id": 1,
+                "type": "Motivation",
+                "title": "Why Sequential Memory?",
+                "philosophy": "How does a computer know where a word ends? Motivation: Sequential access and termination markers."
+            },
+            {
+                "id": 2,
+                "type": "Analogy",
+                "title": "The Train Analogy",
+                "philosophy": "Each car is a character. The caboose is the `\\0` (null terminator). The train stops when it sees the caboose."
+            },
+            {
+                "id": 3,
+                "type": "Mechanical Step 1",
+                "title": "Array Initialization",
+                "philosophy": "Show `char s[] = \"HI\";`. Create an array of 3 boxes. Fill them with 'H', 'I', and '\\0'."
+            },
+            {
+                "id": 4,
+                "type": "Full Action",
+                "title": "String Traversal",
+                "philosophy": "Provide a 'Scan' button. Animate a pointer moving through the string until it hits the '\\0'. Highlight the terminator."
+            },
+            {
+                "id": 5,
+                "type": "Conclusion",
+                "title": "C-String Memory Map",
+                "philosophy": "Final view of how the string looks in RAM. Emphasize that 'Hello' takes 6 bytes, not 5."
+            }
+        ],
+        "non_negotiables": [
+            "Must show the null character '\\0' in red",
+            "Show ASCII numeric values below characters"
+        ]
+    }
+}
